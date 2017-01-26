@@ -12,7 +12,7 @@ public class PlasmaButton {
 	private boolean isHeld = false;
 	
 	/**
-	 * Contructor for the button class
+	 * Constructor for the button class
 	 * 
 	 * @param buttonNum - ID value of the button
 	 * @param joystickPort - Joystick port that the button is on

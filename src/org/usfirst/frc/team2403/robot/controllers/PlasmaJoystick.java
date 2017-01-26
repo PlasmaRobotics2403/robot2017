@@ -25,6 +25,8 @@ public class PlasmaJoystick{
 	public PlasmaTrigger LT;
 	public PlasmaTrigger RT;
 	
+	public PlasmaRumble rumble;
+	
 	private final int port;
 	
 	/**
@@ -57,6 +59,8 @@ public class PlasmaJoystick{
 		
 		LT = new PlasmaTrigger(JoystickConstants.LT_ID, port);
 		RT = new PlasmaTrigger(JoystickConstants.RT_ID, port);
+		
+		rumble = new PlasmaRumble(port);
 	}
 	
 	/**
