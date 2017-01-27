@@ -7,10 +7,16 @@ import edu.wpi.first.wpilibj.*;
 public class Robot extends IterativeRobot {
 
 	PlasmaJoystick joystick;
+	DriveTrain driveTrain;
+
 	
 	@Override
 	public void robotInit() {
 		joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
+		driveTrain = new DriveTrain(Constants.TALON_L_ID,
+									Constants.TALON_L_SLAVE_ID,
+									Constants.TALON_R_ID,
+									Constants.TALON_R_SLAVE_ID);
 	}
 
 	@Override
@@ -25,12 +31,12 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopInit(){
-		
+		driveTrain.navX.zeroYaw();
 	}
 	
 	@Override
 	public void teleopPeriodic() {
-		
+		driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
 	}
 	
 	@Override
