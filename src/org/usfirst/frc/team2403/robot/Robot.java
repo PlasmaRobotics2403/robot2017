@@ -8,6 +8,11 @@ public class Robot extends IterativeRobot {
 
 	PlasmaJoystick joystick;
 	DriveTrain driveTrain;
+	GearManipulator gearManip;
+	Intake intakeFront;
+	Intake intakeRear;
+	Lift lift;
+	Turret turret;
 
 	
 	@Override
@@ -17,6 +22,17 @@ public class Robot extends IterativeRobot {
 									Constants.TALON_L_SLAVE_ID,
 									Constants.TALON_R_ID,
 									Constants.TALON_R_SLAVE_ID);
+		gearManip = new GearManipulator(Constants.GEAR_DOOR_L_PORT,
+												Constants.GEAR_DOOR_R_PORT,
+												Constants.GEAR_PUSH_L_PORT,
+												Constants.GEAR_PUSH_R_PORT);
+		intakeFront = new Intake(Constants.TALON_INTAKE_FRONT_ID);
+		intakeRear = new Intake(Constants.TALON_INTAKE_REAR_ID);
+		lift = new Lift(Constants.TALON_LIFT_LEFT_ID,
+						Constants.TALON_LIFT_RIGHT_ID);
+		turret = new Turret(Constants.TALON_TURRET_L_ID,
+							Constants.TALON_TURRET_R_ID,
+							Constants.TALON_TURRET_SPIN_ID);
 	}
 
 	@Override
