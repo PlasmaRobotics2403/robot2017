@@ -18,6 +18,8 @@ public class Constants {
 	public static final int TALON_TURRET_L_ID = 9;
 	public static final int TALON_TURRET_R_ID = 10;
 	public static final int TALON_TURRET_SPIN_ID = 11;
+	public static final int TALON_CLIMB_L_ID = 12;
+	public static final int TALON_CLIMB_R_ID = 13;
 	
 	/* SERVO PORT CONSTANTS */
 	public static final int GEAR_DOOR_L_PORT = 1;
@@ -26,7 +28,7 @@ public class Constants {
 	public static final int GEAR_PUSH_R_PORT = 4;
 	
 	/*DRIVETRAIN CONSTANTS*/
-	public static final double MAX_SPEED = 1;
-	public static final double MAX_TURN = 1;	
+	public static final double MAX_SPEED = .8;
+	public static final double MAX_TURN = .5;	
 	
 }

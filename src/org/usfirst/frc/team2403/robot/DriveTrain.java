@@ -35,10 +35,10 @@ public class DriveTrain {
 		talonRightSlave = new CANTalon(rightSID);
 		
 		talonLeftSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
-		talonLeftSlave.set(leftSID);
+		talonLeftSlave.set(talonLeft.getDeviceID());
 		
 		talonRightSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
-		talonRightSlave.set(rightSID);
+		talonRightSlave.set(talonRight.getDeviceID());
 		
 		talonLeft.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
 		talonRight.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
@@ -70,7 +70,7 @@ public class DriveTrain {
 	 * @author Nic and Brandon R
 	 */
 
-	public void FPSDrive (PlasmaAxis forwardAxis, PlasmaAxis turnAxis){
+	public void FPSDrive(PlasmaAxis forwardAxis, PlasmaAxis turnAxis){
 		
 		double forwardVal = forwardAxis.getFilteredAxis() * Math.abs(forwardAxis.getFilteredAxis());
 		double turnVal = Constants.MAX_TURN * turnAxis.getFilteredAxis() * Math.abs(turnAxis.getFilteredAxis());
@@ -84,36 +84,36 @@ public class DriveTrain {
 		double speedL;
 		double speedR;
 		
-		if(turnVal == 0){				//Straight forward
+		if(turnVal == 0){ //Straight forward
+			speedL = forwardVal;
+			speedR = forwardVal;
+		}
+		else if(forwardVal == 0){ //Pivot turn
 			speedL = turnVal;
 			speedR = -turnVal;
 		}
-		else if(forwardVal == 0){		//Pivot turn
-			speedL = turnVal;
-			speedR = -turnVal;
+		else if(forwardSign == 1 && turnSign == 1){ //Forward right
+			speedL = forwardVal;
+			speedR = (absForward - absTurn < 0) ? 0 : absForward - absTurn;
 		}
-		else if(forwardSign == 1 && turnSign == 1){		//Forward right
+		else if(forwardSign == 1 && turnSign == -1){ //Forward left
+			speedL = (absForward - absTurn < 0) ? 0 : absForward - absTurn;
+			speedR = forwardVal;
+		}
+		else if(forwardSign == -1 && turnSign == 1){ //Backward right
 			speedL = forwardVal;
 			speedR = (absForward - absTurn < 0) ? 0 : -(absForward - absTurn);
 		}
-		else if(forwardSign == 1 && turnSign == -1){		//Forward left
-			speedL = forwardVal;
-			speedR = (absForward - absTurn < 0) ? 0 : -(absForward - absTurn);
-		}
-		else if(forwardSign == -1 && turnSign == 1){		//Backward right
-			speedL = forwardVal;
-			speedR = (absForward - absTurn < 0) ? 0 : -(absForward - absTurn);
-		}
-		else if(forwardSign == -1 && turnSign == -1){		//Backward left
+		else if(forwardSign == -1 && turnSign == -1){ //Backward left
 			speedL = (absForward - absTurn < 0) ? 0 : -(absForward - absTurn);
 			speedR = forwardVal;
 		}
 		else{
 			speedL = 0;
 			speedR = 0;
-			DriverStation.reportError("Last year's code read: You've got two empty halves of coconut and you're bangin' 'em together. (Bug @ fps drive code - no case triggered)", false);
+			DriverStation.reportError("You've got two empty halves of coconut and you're bangin' 'em together. (Bug @ fps drive code - no case triggered)", false);
 		}
-
+		
 		speedL *= Constants.MAX_SPEED;
 		speedR *= Constants.MAX_SPEED;
 		
@@ -123,7 +123,6 @@ public class DriveTrain {
 		SmartDashboard.putNumber("left encoder", toDistance(talonLeft));
 		SmartDashboard.putNumber("right encoder", toDistance(talonRight));
 		SmartDashboard.putNumber("inches", getDistance());
-		
 	}
 
 	public double toDistance(CANTalon talon){

@@ -22,4 +22,9 @@ public class Lift {
 		
 	}
 	
+	public void spin(double speed){
+		liftLeft.set(speed);
+		liftRight.set(-speed);
+	}
+	
 }

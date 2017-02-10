@@ -13,6 +13,7 @@ public class Robot extends IterativeRobot {
 	Intake intakeRear;
 	Lift lift;
 	Turret turret;
+	Climb climb;
 
 	
 	@Override
@@ -33,6 +34,7 @@ public class Robot extends IterativeRobot {
 		turret = new Turret(Constants.TALON_TURRET_L_ID,
 							Constants.TALON_TURRET_R_ID,
 							Constants.TALON_TURRET_SPIN_ID);
+		climb = new Climb(Constants.TALON_CLIMB_L_ID, Constants.TALON_CLIMB_R_ID);
 	}
 
 	@Override
@@ -53,6 +55,33 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
+		if(joystick.LT.isPressed()){
+			climb.spin(joystick.LT.getFilteredAxis());
+		}
+		else{
+			climb.spin(-joystick.RT.getFilteredAxis());
+		}
+		if(joystick.LB.isPressed()){
+			intakeFront.spin(-.5);
+		}
+		else{
+			intakeFront.spin(0);
+		}
+		if(joystick.RB.isPressed()){
+			intakeRear.spin(-.5);
+		}
+		else{
+			intakeRear.spin(0);
+		}
+		if(joystick.Y.isPressed()){
+			lift.spin(.5);
+		}
+		else if(joystick.A.isPressed()){
+			lift.spin(-.5);
+		}
+		else{
+			lift.spin(0);
+		}
 	}
 	
 	@Override

@@ -20,4 +20,8 @@ public class Intake {
 		
 	}
 	
+	public void spin(double speed){
+		intake.set(speed);
+	}
+	
 }
