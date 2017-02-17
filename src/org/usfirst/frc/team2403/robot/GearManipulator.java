@@ -17,7 +17,7 @@ public class GearManipulator {
 	 * @param pushLeftID - ID of left pusher Talon
 	 * @param pushRightID - ID of right pusher Talon
 	 * 
-	 * @author Brandon R
+	 * @author Nic, Alex and Troy
 	 */	
 	public GearManipulator(int doorLeftID, int doorRightID, int pushLeftID, int pushRightID){
 		
@@ -27,5 +27,24 @@ public class GearManipulator {
 		pusherRight = new Servo(pushRightID);
 		
 	}
+	
+	public void activate(boolean open){
+		if(open){
+			doorLeft.setAngle(Constants.DOOR_OPEN_ANGLE);
+			doorRight.setAngle(Constants.MAX_ANGLE - Constants.DOOR_OPEN_ANGLE);
+			pusherLeft.setAngle(Constants.PUSH_ANGLE);
+			pusherRight.setAngle(Constants.MAX_ANGLE - Constants.PUSH_ANGLE);
+		}
+		else{
+			doorLeft.setAngle(Constants.DOOR_START_ANGLE);
+			doorRight.setAngle(Constants.MAX_ANGLE - Constants.DOOR_START_ANGLE);
+			pusherLeft.setAngle(Constants.PUSH_START_ANGLE);
+			pusherRight.setAngle(Constants.MAX_ANGLE - Constants.PUSH_START_ANGLE);
+		}
+		
+		
+	}
+	
+	
 	
 }

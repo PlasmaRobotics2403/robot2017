@@ -2,11 +2,14 @@ package org.usfirst.frc.team2403.robot;
 
 import com.ctre.CANTalon;
 
+import edu.wpi.first.wpilibj.Encoder;
+
 public class Turret {
 	
 	private CANTalon shooterLeft;
 	private CANTalon shooterRight;
 	private CANTalon lazySusan;
+	private Encoder enc;
 	
 	/**
 	 * Constructor for turret object
@@ -22,7 +25,16 @@ public class Turret {
 		shooterLeft = new CANTalon(leftID);
 		shooterRight = new CANTalon(rightID);
 		lazySusan = new CANTalon(lazyID);
+		enc = new Encoder(8, 9);
 		
 	}
-
+	
+	public void pivot(double speed){
+		lazySusan.set(-speed);
+	}
+	
+	public void shoot(double speed){
+		shooterLeft.set(-speed);
+		shooterRight.set(speed);
+	}
 }

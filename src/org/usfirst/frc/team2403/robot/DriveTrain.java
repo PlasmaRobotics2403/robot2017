@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.*;
 import com.ctre.*;
 import com.ctre.CANTalon.FeedbackDevice;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain {
 
@@ -70,7 +69,7 @@ public class DriveTrain {
 	 * @author Nic and Brandon R
 	 */
 
-	public void FPSDrive(PlasmaAxis forwardAxis, PlasmaAxis turnAxis){
+public void FPSDrive(PlasmaAxis forwardAxis, PlasmaAxis turnAxis){
 		
 		double forwardVal = forwardAxis.getFilteredAxis() * Math.abs(forwardAxis.getFilteredAxis());
 		double turnVal = Constants.MAX_TURN * turnAxis.getFilteredAxis() * Math.abs(turnAxis.getFilteredAxis());
@@ -120,9 +119,7 @@ public class DriveTrain {
 		talonLeft.set(speedL);
 		talonRight.set(speedR);
 		
-		SmartDashboard.putNumber("left encoder", toDistance(talonLeft));
-		SmartDashboard.putNumber("right encoder", toDistance(talonRight));
-		SmartDashboard.putNumber("inches", getDistance());
+		
 	}
 
 	public double toDistance(CANTalon talon){

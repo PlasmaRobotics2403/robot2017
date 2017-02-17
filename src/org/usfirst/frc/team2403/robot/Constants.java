@@ -3,7 +3,7 @@ package org.usfirst.frc.team2403.robot;
 public class Constants {
 
 	
-	/* PORT CONSTANTS */
+	/* CONTROLLER CONSTANTS */
 	public static final int JOYSTICK1_PORT = 0;
 	
 	/* TALON ID CONSTANTS */
@@ -22,13 +22,21 @@ public class Constants {
 	public static final int TALON_CLIMB_R_ID = 13;
 	
 	/* SERVO PORT CONSTANTS */
-	public static final int GEAR_DOOR_L_PORT = 1;
-	public static final int GEAR_DOOR_R_PORT = 2;
+	public static final int GEAR_DOOR_L_PORT = 2;
+	public static final int GEAR_DOOR_R_PORT = 0;
 	public static final int GEAR_PUSH_L_PORT = 3;
-	public static final int GEAR_PUSH_R_PORT = 4;
+	public static final int GEAR_PUSH_R_PORT = 1;
 	
 	/*DRIVETRAIN CONSTANTS*/
 	public static final double MAX_SPEED = .8;
-	public static final double MAX_TURN = .5;	
+	public static final double MAX_TURN = 1;	
+	
+	/*GEAR MANIPULATOR CONSTANTS*/
+	public static final double DOOR_OPEN_ANGLE = 55.0;
+	public static final double DOOR_START_ANGLE = 5.0;
+	public static final double PUSH_ANGLE = 70.0;
+	public static final double PUSH_START_ANGLE = 0;
+	public static final double MAX_ANGLE = 180;
+	
 	
 }
