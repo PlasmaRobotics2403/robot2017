@@ -1,6 +1,7 @@
 package org.usfirst.frc.team2403.robot;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class GearManipulator {
 
@@ -8,7 +9,7 @@ public class GearManipulator {
 	private Servo doorRight;
 	private Servo pusherLeft;
 	private Servo pusherRight;
-	
+	public 	NetworkTable table;
 	/**
 	 * Constructor for gear manipulator object
 	 * 
@@ -44,7 +45,5 @@ public class GearManipulator {
 		
 		
 	}
-	
-	
 	
 }

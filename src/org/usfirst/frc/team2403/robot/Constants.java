@@ -5,6 +5,7 @@ public class Constants {
 	
 	/* CONTROLLER CONSTANTS */
 	public static final int JOYSTICK1_PORT = 0;
+	public static final int JOYSTICK2_PORT = 1;
 	
 	/* TALON ID CONSTANTS */
 	public static final int TALON_L_ID = 1;
@@ -38,5 +39,7 @@ public class Constants {
 	public static final double PUSH_START_ANGLE = 0;
 	public static final double MAX_ANGLE = 180;
 	
+	/*NETWORK TABLES CONSTANTS*/
+	public static final String NETWORK_TABLE_NAME = "vision";
 	
 }

@@ -3,11 +3,13 @@ package org.usfirst.frc.team2403.robot;
 import org.usfirst.frc.team2403.robot.controllers.*;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
 
 	PlasmaJoystick joystick;
-	PlasmaGuitar guitar;
+	PlasmaJoystick joystick2;
 	DriveTrain driveTrain;
 	GearManipulator gearManip;
 	Intake intakeFront;
@@ -15,13 +17,13 @@ public class Robot extends IterativeRobot {
 	Lift lift;
 	Turret turret;
 	Climb climb;
-	
-	Servo test;
+		
+	NetworkTable networkTable;
 	
 	@Override
 	public void robotInit() {
 		joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
-		guitar = new PlasmaGuitar(1);
+		joystick2 = new PlasmaJoystick(Constants.JOYSTICK2_PORT);
 		driveTrain = new DriveTrain(Constants.TALON_L_ID,
 									Constants.TALON_L_SLAVE_ID,
 									Constants.TALON_R_ID,
@@ -38,16 +40,23 @@ public class Robot extends IterativeRobot {
 							Constants.TALON_TURRET_R_ID,
 							Constants.TALON_TURRET_SPIN_ID);
 		climb = new Climb(Constants.TALON_CLIMB_L_ID, Constants.TALON_CLIMB_R_ID);
+		
+		NetworkTable.setUpdateRate(.01);
+		NetworkTable.initialize();
+		networkTable = NetworkTable.getTable(Constants.NETWORK_TABLE_NAME);
 	}
 
 	@Override
 	public void autonomousInit() {
-
+		
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-
+		SmartDashboard.putNumber("angle", networkTable.getNumber("gearElevatorAngle", 0));
+		SmartDashboard.putNumber("dist", networkTable.getNumber("gearElevatorDistance", 0));
+		
+		
 	}
 	
 	@Override
@@ -57,7 +66,20 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopPeriodic() {
-		driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
+		
+		
+		if(joystick.A.isPressed() && networkTable.getNumber("gearElevatorDistance", -1) != -1){
+			double angle = networkTable.getNumber("gearElevatorAngle", 0);
+			if(Math.abs(angle) > 5){
+				driveTrain.FPSDrive(0, -angle / 20);
+			}
+			else{
+				driveTrain.FPSDrive(.3, -angle / 20);
+			}
+		}
+		else{
+			driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
+		}
 		if(joystick.LT.isPressed()){
 			climb.spin(joystick.LT.getFilteredAxis());
 		}
@@ -67,29 +89,22 @@ public class Robot extends IterativeRobot {
 		gearManip.activate(joystick.START.isPressed());
 		
 		
-		if(guitar.YELLOW.isPressed()){
-			lift.spin(.5);
+		
+		if(joystick2.Y.isPressed()){
+			lift.spin(1);
 		}
-		else if(guitar.BLUE.isPressed()){
-			lift.spin(-.5);
+		else if(joystick2.A.isPressed()){
+			lift.spin(-1);
 		}
 		else{
 			lift.spin(0);
 		}
 		
-		if(guitar.GREEN.isPressed()){
-			turret.pivot(.6);
-		}
-		else if(guitar.RED.isPressed()){
-			turret.pivot(-.6);
-		}
-		else{
-			turret.pivot(0);
-		}
+		turret.pivot(joystick2.LeftX.getFilteredAxis() * -.5);
 		
-		turret.shoot((guitar.whammyBar.getFilteredAxis() + 1) * .5);
+		turret.shoot(joystick2.RT.getFilteredAxis());
 		
-		if(guitar.ORANGE.isPressed()){
+		if(joystick2.LB.isToggledOn()){
 			intakeFront.spin(-.5);
 			intakeRear.spin(-.5);
 		}
@@ -108,10 +123,10 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic() {
 		gearManip.activate(false);
 		if(joystick.Y.isPressed()){
-			lift.spin(.5);
+			lift.spin(1);
 		}
 		else if(joystick.A.isPressed()){
-			lift.spin(-.5);
+			lift.spin(-1);
 		}
 		else{
 			lift.spin(0);
