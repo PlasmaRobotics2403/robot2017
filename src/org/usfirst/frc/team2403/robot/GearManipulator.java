@@ -31,6 +31,23 @@ public class GearManipulator {
 	
 	public void activate(boolean open){
 		if(open){
+			doorLeft.setAngle(0);
+			doorRight.setAngle(90);
+			pusherLeft.setAngle(0);
+			pusherRight.setAngle(90);
+		}
+		else{
+			doorLeft.setAngle(90);
+			doorRight.setAngle(0);
+			pusherLeft.setAngle(0);
+			pusherRight.setAngle(90);
+		}
+		
+		
+	}
+	/*
+	public void activate(boolean open){
+		if(open){
 			doorLeft.setAngle(Constants.DOOR_OPEN_ANGLE);
 			doorRight.setAngle(Constants.MAX_ANGLE - Constants.DOOR_OPEN_ANGLE);
 			pusherLeft.setAngle(Constants.PUSH_ANGLE);
@@ -45,5 +62,6 @@ public class GearManipulator {
 		
 		
 	}
+	*/
 	
 }

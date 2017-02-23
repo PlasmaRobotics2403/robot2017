@@ -1,8 +1,10 @@
 package org.usfirst.frc.team2403.robot;
 
+import org.usfirst.frc.team2403.robot.autoModes.BaselineAuto;
 import org.usfirst.frc.team2403.robot.controllers.*;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -17,8 +19,12 @@ public class Robot extends IterativeRobot {
 	Lift lift;
 	Turret turret;
 	Climb climb;
-		
+	
+	
 	NetworkTable networkTable;
+	
+	BaselineAuto auto;
+
 	
 	@Override
 	public void robotInit() {
@@ -44,19 +50,29 @@ public class Robot extends IterativeRobot {
 		NetworkTable.setUpdateRate(.01);
 		NetworkTable.initialize();
 		networkTable = NetworkTable.getTable(Constants.NETWORK_TABLE_NAME);
+		
+		CameraServer.getInstance().startAutomaticCapture();//.setResolution(1080, 1080);		
+		
 	}
-
+	@Override
+	public void robotPeriodic(){
+	}
+	
+	double time;
+	
 	@Override
 	public void autonomousInit() {
-		
+		time = Timer.getFPGATimestamp();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		SmartDashboard.putNumber("angle", networkTable.getNumber("gearElevatorAngle", 0));
-		SmartDashboard.putNumber("dist", networkTable.getNumber("gearElevatorDistance", 0));
-		
-		
+		if(Timer.getFPGATimestamp() < time + 3){
+			driveTrain.FPSDrive(.5, 0);
+		}
+		else{
+			driveTrain.FPSDrive(0, 0);
+		}
 	}
 	
 	@Override
@@ -104,9 +120,13 @@ public class Robot extends IterativeRobot {
 		
 		turret.shoot(joystick2.RT.getFilteredAxis());
 		
-		if(joystick2.LB.isToggledOn()){
+		if(joystick2.RB.isPressed()){
 			intakeFront.spin(-.5);
 			intakeRear.spin(-.5);
+		}
+		else if(joystick2.LB.isPressed()){
+			intakeFront.spin(.5);
+			intakeRear.spin(.5);
 		}
 		else{
 			intakeFront.spin(0);

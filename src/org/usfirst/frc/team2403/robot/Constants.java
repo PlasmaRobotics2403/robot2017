@@ -35,7 +35,7 @@ public class Constants {
 	/*GEAR MANIPULATOR CONSTANTS*/
 	public static final double DOOR_OPEN_ANGLE = 55.0;
 	public static final double DOOR_START_ANGLE = 5.0;
-	public static final double PUSH_ANGLE = 70.0;
+	public static final double PUSH_ANGLE = 90.0;
 	public static final double PUSH_START_ANGLE = 0;
 	public static final double MAX_ANGLE = 180;
 	
