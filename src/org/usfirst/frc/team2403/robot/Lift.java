@@ -4,27 +4,37 @@ import com.ctre.CANTalon;
 
 public class Lift {
 
-	private CANTalon liftLeft;
-	private CANTalon liftRight;
+	private CANTalon liftFront;
+	private CANTalon liftRear;
 	
 	/**
 	 * Constructor for lift object
 	 * 
-	 * @param leftID - ID of left elevator lift Talon
-	 * @param rightID - ID of right elevator lift Talon
+	 * @param frontID - ID of left elevator lift Talon
+	 * @param rearID - ID of right elevator lift Talon
 	 * 
 	 * @author Brandon R
 	 */	
-	public Lift(int leftID, int rightID){
+	public Lift(int frontID, int rearID){
+		liftFront = new CANTalon(frontID);
+		liftRear = new CANTalon(rearID);
 		
-		liftLeft = new CANTalon(leftID);
-		liftRight = new CANTalon(rightID);
-		
+		liftRear.changeControlMode(CANTalon.TalonControlMode.Follower);
+		liftRear.reverseOutput(true);
+		liftRear.set(liftFront.getDeviceID());
 	}
 	
+	
 	public void spin(double speed){
-		liftLeft.set(speed);
-		liftRight.set(-speed);
+		liftFront.set(speed * Constants.MAX_LIFT_SPEED);
+	}
+	
+	public void up(double speed){
+		spin(Math.abs(speed));
+	}
+	
+	public void down(double speed){
+		spin(-Math.abs(speed));
 	}
 	
 }

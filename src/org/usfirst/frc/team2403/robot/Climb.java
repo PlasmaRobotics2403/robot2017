@@ -4,17 +4,21 @@ import com.ctre.CANTalon;
 
 public class Climb {
 
-	CANTalon climbL;
-	CANTalon climbR;
+	private CANTalon climbLeft;
+	private CANTalon climbRight;
 	
 	public Climb(int leftID, int rightID){
-		climbL = new CANTalon(leftID);
-		climbR = new CANTalon(rightID);
+		climbLeft = new CANTalon(leftID);
+		climbRight = new CANTalon(rightID);
+		
+		climbRight.changeControlMode(CANTalon.TalonControlMode.Follower);
+		climbRight.reverseOutput(true);
+		climbRight.set(climbLeft.getDeviceID());
 	}
 	
-	public void spin(double speed){
-		climbL.set(speed);
-		climbR.set(-speed);
+	public void up(double speed){
+		climbLeft.set(Math.abs(speed));
 	}
+	
 	
 }

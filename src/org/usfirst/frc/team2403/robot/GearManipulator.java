@@ -1,15 +1,13 @@
 package org.usfirst.frc.team2403.robot;
 
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class GearManipulator {
 
 	private Servo doorLeft;
 	private Servo doorRight;
 	private Servo pusherLeft;
-	private Servo pusherRight;
-	public 	NetworkTable table;
+	private Servo pusherRight;	
 	/**
 	 * Constructor for gear manipulator object
 	 * 
@@ -25,11 +23,10 @@ public class GearManipulator {
 		doorLeft = new Servo(doorLeftID);
 		doorRight = new Servo(doorRightID);
 		pusherLeft = new Servo(pushLeftID);
-		pusherRight = new Servo(pushRightID);
-		
+		pusherRight = new Servo(pushRightID);		
 	}
 	
-	public void activate(boolean open){
+	public void newBotActivate(boolean open){
 		if(open){
 			doorLeft.setAngle(0);
 			doorRight.setAngle(90);
@@ -39,13 +36,11 @@ public class GearManipulator {
 		else{
 			doorLeft.setAngle(90);
 			doorRight.setAngle(0);
-			pusherLeft.setAngle(0);
-			pusherRight.setAngle(90);
+			pusherLeft.setAngle(90);
+			pusherRight.setAngle(0);
 		}
-		
-		
 	}
-	/*
+	
 	public void activate(boolean open){
 		if(open){
 			doorLeft.setAngle(Constants.DOOR_OPEN_ANGLE);
@@ -62,6 +57,6 @@ public class GearManipulator {
 		
 		
 	}
-	*/
+	
 	
 }

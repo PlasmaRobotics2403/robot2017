@@ -11,10 +11,10 @@ import com.ctre.CANTalon.FeedbackDevice;
 
 public class DriveTrain {
 
-	CANTalon talonLeft;
-	CANTalon talonLeftSlave;
-	CANTalon talonRight;
-	CANTalon talonRightSlave;
+	private CANTalon talonLeft;
+	private CANTalon talonLeftSlave;
+	private CANTalon talonRight;
+	private CANTalon talonRightSlave;
 	
 	public AHRS navX;
 	
@@ -78,9 +78,9 @@ public class DriveTrain {
 		
 	}
 	
-public void FPSDrive(double forwardVal, double turnVal){
+	public void FPSDrive(double forwardVal, double turnVal){
 		
-		turnVal *= Constants.MAX_TURN;
+		turnVal *= Constants.MAX_DRIVE_TURN;
 	
 		double absForward = Math.abs(forwardVal);
 		double absTurn = Math.abs(turnVal);
@@ -121,8 +121,8 @@ public void FPSDrive(double forwardVal, double turnVal){
 			DriverStation.reportError("You've got two empty halves of coconut and you're bangin' 'em together. (Bug @ fps drive code - no case triggered)", false);
 		}
 		
-		speedL *= Constants.MAX_SPEED;
-		speedR *= Constants.MAX_SPEED;
+		speedL *= Constants.MAX_DRIVE_SPEED;
+		speedR *= Constants.MAX_DRIVE_SPEED;
 		
 		talonLeft.set(speedL);
 		talonRight.set(speedR);
@@ -136,19 +136,29 @@ public void FPSDrive(double forwardVal, double turnVal){
 	
 	/**
 	*Tank drive for automated driving
-	56*
+	*
 	*@param left - Speed for left motor
 	*@param right - Speed for right motor
 	*
 	*@author Nic and Brandon R
 	*/
 	public void autonTankDrive(double left, double right){
-		talonLeft.set(left);
-		talonRight.set(right);
+		talonLeft.set(left * Constants.MAX_DRIVE_SPEED);
+		talonRight.set(right * Constants.MAX_DRIVE_SPEED);
+	}
+	
+	public void leftWheelDrive(double speed){
+		talonLeft.set(speed * Constants.MAX_DRIVE_SPEED);
+	}
+	
+	public void rightWheelDrive(double speed){
+		talonRight.set(speed * Constants.MAX_DRIVE_SPEED);
 	}
 	
 	public void gyroStraight(double speed, double angle){
 		autonTankDrive(speed - 0.01*(navX.getYaw() - angle), speed + 0.01*(navX.getYaw() - angle));
 	}
+
+	
 
 }	

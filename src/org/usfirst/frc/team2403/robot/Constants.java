@@ -14,8 +14,8 @@ public class Constants {
 	public static final int TALON_R_SLAVE_ID = 4;
 	public static final int TALON_INTAKE_FRONT_ID = 5;
 	public static final int TALON_INTAKE_REAR_ID = 6;
-	public static final int TALON_LIFT_LEFT_ID = 7;
-	public static final int TALON_LIFT_RIGHT_ID = 8;
+	public static final int TALON_LIFT_FRONT_ID = 7;
+	public static final int TALON_LIFT_REAR_ID = 8;
 	public static final int TALON_TURRET_L_ID = 9;
 	public static final int TALON_TURRET_R_ID = 10;
 	public static final int TALON_TURRET_SPIN_ID = 11;
@@ -29,8 +29,8 @@ public class Constants {
 	public static final int GEAR_PUSH_R_PORT = 1;
 	
 	/*DRIVETRAIN CONSTANTS*/
-	public static final double MAX_SPEED = .8;
-	public static final double MAX_TURN = 1;	
+	public static final double MAX_DRIVE_SPEED = .8;
+	public static final double MAX_DRIVE_TURN = .7;	
 	
 	/*GEAR MANIPULATOR CONSTANTS*/
 	public static final double DOOR_OPEN_ANGLE = 55.0;
@@ -39,7 +39,17 @@ public class Constants {
 	public static final double PUSH_START_ANGLE = 0;
 	public static final double MAX_ANGLE = 180;
 	
+	/*LIFT CONSTANTS*/
+	public static final double MAX_LIFT_SPEED = .8;
+	
+	/*CLIMB_CONSTANTS*/
+	public static final double MAX_CLIMB_SPEED = .8;
+	
+	/*INTAKE CONSTANTS*/
+	public static final double MAX_INTAKE_SPEED = .8;
+	
 	/*NETWORK TABLES CONSTANTS*/
-	public static final String NETWORK_TABLE_NAME = "vision";
+	public static final String VISION_TABLE_NAME = "vision";
+	public static final String DASHBOARD_TABLE_NAME = "dashboard";
 	
 }

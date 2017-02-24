@@ -10,18 +10,26 @@ public class Intake {
 	/**
 	 * Constructor for intake object
 	 * 
-	 * @param port - ID of intake Talon
+	 * @param ID - ID of intake Talon
 	 * 
 	 * @author Brandon R
 	 */	
-	public Intake(int port){
-		
-		intake = new CANTalon(port);
-		
+	public Intake(int ID){
+		intake = new CANTalon(ID);
+
 	}
 	
+	
 	public void spin(double speed){
-		intake.set(speed);
+		intake.set(speed * Constants.MAX_LIFT_SPEED);
+	}
+	
+	public void in(double speed){
+		spin(Math.abs(speed));
+	}
+	
+	public void out(double speed){
+		spin(-Math.abs(speed));
 	}
 	
 }
