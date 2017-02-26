@@ -5,6 +5,8 @@ import org.usfirst.frc.team2403.robot.controllers.*;
 import com.kauailabs.navx.frc.*;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.ctre.*;
 import com.ctre.CANTalon.FeedbackDevice;
 
@@ -157,6 +159,11 @@ public class DriveTrain {
 	
 	public void gyroStraight(double speed, double angle){
 		autonTankDrive(speed - 0.01*(navX.getYaw() - angle), speed + 0.01*(navX.getYaw() - angle));
+	}
+	
+	public void reportGyroData(){
+		SmartDashboard.putNumber("test", navX.getYaw());
+		DriverStation.reportWarning("" + navX.getYaw(), false);
 	}
 
 	

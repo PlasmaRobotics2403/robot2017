@@ -48,6 +48,10 @@ public class Constants {
 	/*INTAKE CONSTANTS*/
 	public static final double MAX_INTAKE_SPEED = .8;
 	
+	/*SHOOTER CONSTANTS*/
+	public static final double MAX_SPIN_SPEED = .5;
+	public static final int TURRET_ABS_ENC_OFFSET = 400;
+	
 	/*NETWORK TABLES CONSTANTS*/
 	public static final String VISION_TABLE_NAME = "vision";
 	public static final String DASHBOARD_TABLE_NAME = "dashboard";

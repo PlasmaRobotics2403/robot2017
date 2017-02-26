@@ -3,6 +3,8 @@ package org.usfirst.frc.team2403.robot;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 //import edu.wpi.first.wpilibj.Encoder;
 
 public class Turret {
@@ -17,7 +19,7 @@ public class Turret {
 	 * 
 	 * @param leftID - ID of left (flywheel) shooter Talon
 	 * @param rightID - ID of right (flywheel) shooter Talon
-	 * @param lazyID - ID of lazy Susan Talon
+	 * @param lazyID - ID of lazy susan Talon
 	 * 
 	 * @author Brandon R
 	 */	
@@ -27,17 +29,21 @@ public class Turret {
 		shooterRight = new CANTalon(rightID);
 		lazySusan = new CANTalon(lazyID);
 		
-		lazySusan.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+		lazySusan.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
+		lazySusan.setPulseWidthPosition(0);
 		
 	}
 	
 	public void pivot(double speed){
-		lazySusan.set(-speed);
+		lazySusan.set(-speed * Constants.MAX_SPIN_SPEED);
+		SmartDashboard.putNumber("turret angle", lazySusan.get);
 	}
 	
 	public void shoot(double speed){
 		shooterLeft.set(-speed);
 		shooterRight.set(speed);
 	}
+	
+	
 	
 }
