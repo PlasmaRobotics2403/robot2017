@@ -30,13 +30,12 @@ public class Turret {
 		lazySusan = new CANTalon(lazyID);
 		
 		lazySusan.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
-		lazySusan.setPulseWidthPosition(0);
-		
+		lazySusan.setPulseWidthPosition(lazySusan.getPulseWidthPosition() - Constants.TURRET_ABS_ENC_OFFSET);
 	}
 	
 	public void pivot(double speed){
 		lazySusan.set(-speed * Constants.MAX_SPIN_SPEED);
-		SmartDashboard.putNumber("turret angle", lazySusan.get);
+		SmartDashboard.putNumber("turret angle", lazySusan.getPosition());
 	}
 	
 	public void shoot(double speed){
