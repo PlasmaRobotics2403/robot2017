@@ -30,11 +30,11 @@ public class Lift {
 	}
 	
 	public void up(double speed){
-		spin(Math.abs(speed));
+		spin(-Math.abs(speed));
 	}
 	
 	public void down(double speed){
-		spin(-Math.abs(speed));
+		spin(Math.abs(speed));
 	}
 	
 }

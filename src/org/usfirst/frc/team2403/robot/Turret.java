@@ -37,6 +37,11 @@ public class Turret {
 		
 		lazySusan.setProfile(0);
 		
+		//shooterLeft.changeControlMode(TalonControlMode.Speed);
+		//shooterRight.changeControlMode(TalonControlMode.Speed);
+		shooterLeft.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+		shooterRight.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+		
 		//lazySusan.setPID(.3, 0, 0, 0, 0, 3.0, 0);
 		//lazySusan.setCloseLoopRampRate(3.0);
 		//lazySusan.setPID(.1, .0002, 2, 0, 0, 0, 1);
@@ -52,7 +57,11 @@ public class Turret {
 	public void shoot(double speed){
 		shooterLeft.set(-speed);
 		shooterRight.set(speed);
+		SmartDashboard.putNumber("shoot speed left", shooterLeft.getSpeed());
+		SmartDashboard.putNumber("shoot speed right", shooterRight.getSpeed());
 	}
+	
+
 	
 	int lastSide = 0;
 	public void testTurn(double angle){

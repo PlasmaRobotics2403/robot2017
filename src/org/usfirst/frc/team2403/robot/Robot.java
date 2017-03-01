@@ -92,22 +92,32 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		
 		driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
-		/*
-		gearManip.activate(joystick.A.isPressed());
-		climb.up(joystick.RT.getFilteredAxis());
+		
+		//gearManip.activate(joystick.A.isPressed());
+		//climb.up(joystick.RT.getFilteredAxis());
 		if(joystick.RB.isPressed()){
-			intakeRear.in(.5);
-			intakeFront.in(.5);
+			intakeRear.in(1);
+			intakeFront.in(1);
 		}
 		else if(joystick.LB.isPressed()){
-			intakeRear.out(.5);
-			intakeFront.out(.5);
+			intakeRear.out(1);
+			intakeFront.out(1);
 		}
 		else{
 			intakeRear.in(0);
 			intakeFront.in(0);
 		}
-		*/
+		
+		if(joystick.A.isPressed()){
+			lift.up(1);
+		}
+		else if(joystick.Y.isPressed()){
+			lift.down(1);
+		}
+		else{
+			lift.up(0);
+		}
+		
 		//turret.pivot(joystick.LeftX.getFilteredAxis());
 		/*
 		if(joystick.A.isPressed()){
@@ -128,6 +138,7 @@ public class Robot extends IterativeRobot {
 		
 		//turret.autoAim(joystick.A.isOnToOff());
 		turret.autoAim(true);
+		turret.shoot(joystick.RT.getFilteredAxis());
 	}
 	
 	@Override
