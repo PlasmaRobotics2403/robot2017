@@ -50,7 +50,8 @@ public class Constants {
 	
 	/*SHOOTER CONSTANTS*/
 	public static final double MAX_SPIN_SPEED = .5;
-	public static final int TURRET_ABS_ENC_OFFSET = 400;
+	public static final int TURRET_ABS_ENC_OFFSET = -961;
+	public static final double TURRET_ROTS_PER_DEGREE = .0160048;
 	
 	/*NETWORK TABLES CONSTANTS*/
 	public static final String VISION_TABLE_NAME = "vision";

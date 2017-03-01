@@ -17,7 +17,7 @@ public class Climb {
 	}
 	
 	public void up(double speed){
-		climbLeft.set(Math.abs(speed));
+		climbLeft.set(-Math.abs(speed));
 	}
 	
 	

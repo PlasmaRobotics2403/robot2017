@@ -25,6 +25,11 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotInit() {
+		NetworkTable.setUpdateRate(.01);
+		NetworkTable.initialize();
+		visionTable = NetworkTable.getTable(Constants.VISION_TABLE_NAME);
+		dashboardTable = NetworkTable.getTable(Constants.DASHBOARD_TABLE_NAME);	
+		
 		joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
 		joystick2 = new PlasmaJoystick(Constants.JOYSTICK2_PORT);
 		driveTrain = new DriveTrain(Constants.TALON_L_ID,
@@ -41,18 +46,14 @@ public class Robot extends IterativeRobot {
 						Constants.TALON_LIFT_REAR_ID);
 		turret = new Turret(Constants.TALON_TURRET_L_ID,
 							Constants.TALON_TURRET_R_ID,
-							Constants.TALON_TURRET_SPIN_ID);
+							Constants.TALON_TURRET_SPIN_ID,
+							visionTable);
 		climb = new Climb(Constants.TALON_CLIMB_L_ID, 
 							Constants.TALON_CLIMB_R_ID);
 		
-		autoModeRunner = new AutoModeRunner();
+		autoModeRunner = new AutoModeRunner();	
 		
-		NetworkTable.setUpdateRate(.01);
-		NetworkTable.initialize();
-		visionTable = NetworkTable.getTable(Constants.VISION_TABLE_NAME);
-		dashboardTable = NetworkTable.getTable(Constants.DASHBOARD_TABLE_NAME);		
-		
-		CameraServer.getInstance().startAutomaticCapture();//.setResolution(1080, 1080);		
+		CameraServer.getInstance().startAutomaticCapture();//.setResolution(1080, 1080);
 		
 	}
 	@Override
@@ -89,8 +90,44 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopPeriodic() {
-		//driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
-		turret.pivot(joystick.LeftX.getFilteredAxis());
+		
+		driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
+		/*
+		gearManip.activate(joystick.A.isPressed());
+		climb.up(joystick.RT.getFilteredAxis());
+		if(joystick.RB.isPressed()){
+			intakeRear.in(.5);
+			intakeFront.in(.5);
+		}
+		else if(joystick.LB.isPressed()){
+			intakeRear.out(.5);
+			intakeFront.out(.5);
+		}
+		else{
+			intakeRear.in(0);
+			intakeFront.in(0);
+		}
+		*/
+		//turret.pivot(joystick.LeftX.getFilteredAxis());
+		/*
+		if(joystick.A.isPressed()){
+			turret.testTurn(45);
+		}
+		else{
+			turret.testTurn(0);
+		}
+		*/
+		/*
+		if(joystick.Y.isOffToOn()){
+			CameraServer.getInstance().removeCamera("USB Camera 0");
+		}
+		else if(joystick.Y.isOnToOff()){
+			CameraServer.getInstance().startAutomaticCapture();
+		}
+		*/
+		
+		//turret.autoAim(joystick.A.isOnToOff());
+		turret.autoAim(true);
 	}
 	
 	@Override

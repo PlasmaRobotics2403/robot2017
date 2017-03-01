@@ -25,11 +25,11 @@ public class Intake {
 	}
 	
 	public void in(double speed){
-		spin(Math.abs(speed));
+		spin(-Math.abs(speed));
 	}
 	
 	public void out(double speed){
-		spin(-Math.abs(speed));
+		spin(Math.abs(speed));
 	}
 	
 }
