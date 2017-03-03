@@ -41,12 +41,25 @@ public class GearManipulator {
 		}
 	}
 	
+	boolean wasOpen = false;
+	double timeToPush = 0;
 	public void activate(boolean open){
 		if(open){
 			doorLeft.setAngle(Constants.DOOR_OPEN_ANGLE);
 			doorRight.setAngle(Constants.MAX_ANGLE - Constants.DOOR_OPEN_ANGLE);
-			pusherLeft.setAngle(Constants.PUSH_ANGLE);
-			pusherRight.setAngle(Constants.MAX_ANGLE - Constants.PUSH_ANGLE);
+			
+			if(wasOpen == false){
+				timeToPush = Timer.getFPGATimestamp() + .1;
+			}
+			
+			if(Timer.getFPGATimestamp() > timeToPush){
+				pusherLeft.setAngle(Constants.PUSH_ANGLE);
+				pusherRight.setAngle(Constants.MAX_ANGLE - Constants.PUSH_ANGLE);
+			}
+			else{
+				pusherLeft.setAngle(Constants.PUSH_START_ANGLE);
+				pusherRight.setAngle(Constants.MAX_ANGLE - Constants.PUSH_START_ANGLE);
+			}
 		}
 		else{
 			doorLeft.setAngle(Constants.DOOR_START_ANGLE);
@@ -54,7 +67,7 @@ public class GearManipulator {
 			pusherLeft.setAngle(Constants.PUSH_START_ANGLE);
 			pusherRight.setAngle(Constants.MAX_ANGLE - Constants.PUSH_START_ANGLE);
 		}
-		
+		wasOpen = open;
 		
 	}
 	

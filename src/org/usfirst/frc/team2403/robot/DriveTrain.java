@@ -18,7 +18,7 @@ public class DriveTrain {
 	private CANTalon talonRight;
 	private CANTalon talonRightSlave;
 	
-	public AHRS navX;
+	private AHRS navX;
 	
 	/**
 	*
@@ -49,6 +49,7 @@ public class DriveTrain {
 		talonRight.setPosition(0);
 		
 		talonRight.setInverted(true);
+		talonLeft.reverseSensor(true);
 		
 		navX = new AHRS(SerialPort.Port.kMXP);
 	}
@@ -59,7 +60,7 @@ public class DriveTrain {
 	}
 	
 	public double getDistance(){
-		return toDistance(talonRight);
+		return (toDistance(talonRight) + toDistance(talonLeft))/2;
 	}
 
 	/**
@@ -133,7 +134,7 @@ public class DriveTrain {
 	}
 
 	public double toDistance(CANTalon talon){
-		return talon.getPosition() * 25.5;
+		return talon.getPosition() * Constants.DRIVE_ENCODER_CONVERSION;
 	}
 	
 	/**
@@ -145,8 +146,8 @@ public class DriveTrain {
 	*@author Nic and Brandon R
 	*/
 	public void autonTankDrive(double left, double right){
-		talonLeft.set(left * Constants.MAX_DRIVE_SPEED);
-		talonRight.set(right * Constants.MAX_DRIVE_SPEED);
+		leftWheelDrive(left);
+		rightWheelDrive(right);
 	}
 	
 	public void leftWheelDrive(double speed){
@@ -161,9 +162,32 @@ public class DriveTrain {
 		autonTankDrive(speed - 0.01*(navX.getYaw() - angle), speed + 0.01*(navX.getYaw() - angle));
 	}
 	
-	public void reportGyroData(){
+	public void pivotToAngle(double angle){
+		if(getGyroAngle() - angle > 0){
+			autonTankDrive(-.3, .3);
+		}
+		else{
+			autonTankDrive(.3, -.3);
+		}
+	}
+	
+	public void stopDrive(){
+		autonTankDrive(0, 0);
+	}
+	
+	public double getGyroAngle(){
+		return navX.getYaw();
+	}
+	
+	public void zeroGyro(){
+		navX.zeroYaw();
+	}
+	
+	public void reportDriveData(){
 		SmartDashboard.putNumber("test", navX.getYaw());
-		DriverStation.reportWarning("" + navX.getYaw(), false);
+		SmartDashboard.putNumber("encoder", talonRight.getPosition());
+		SmartDashboard.putNumber("distanceR", toDistance(talonRight));
+		SmartDashboard.putNumber("distanceL", toDistance(talonLeft));
 	}
 
 	

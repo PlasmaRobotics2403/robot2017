@@ -88,11 +88,11 @@ public class Turret {
 		SmartDashboard.putNumber("turret angle", toAngle(lazySusan.getPosition()));
 		lastSide = side;
 	}
+	
 	double angle = 0;
 	public void autoAim(boolean doUpdate){
-		table.putNumber("photoAngle", toAngle(lazySusan.getPosition()));
 		if(doUpdate){
-			angle = table.getNumber("realAngleNeeded", 0);
+			angle = table.getNumber(Constants.TURRET_OUTPUT_ANGLE_NAME, 0);
 		}
 		testTurn(angle);
 	}
@@ -103,6 +103,10 @@ public class Turret {
 	
 	public static double toAngle(double rots){
 		return rots / Constants.TURRET_ROTS_PER_DEGREE;
+	}
+	
+	public double getCurrentAngle(){
+		return toAngle(lazySusan.getPosition());
 	}
 	
 	

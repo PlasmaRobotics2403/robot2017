@@ -5,6 +5,7 @@ import org.usfirst.frc.team2403.robot.auto.util.*;
 import org.usfirst.frc.team2403.robot.controllers.*;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
 
@@ -17,7 +18,7 @@ public class Robot extends IterativeRobot {
 	Lift lift;
 	Turret turret;
 	Climb climb;
-		
+	
 	NetworkTable visionTable;
 	NetworkTable dashboardTable;
 	
@@ -58,6 +59,8 @@ public class Robot extends IterativeRobot {
 	}
 	@Override
 	public void robotPeriodic(){
+		networkTablesBroadcast();
+		driveTrain.reportDriveData();
 	}
 	
 	@Override
@@ -72,7 +75,7 @@ public class Robot extends IterativeRobot {
 		
 	@Override
 	public void autonomousInit() {
-		driveTrain.navX.zeroYaw();
+		driveTrain.zeroGyro();
 		autoModeRunner.chooseAutoMode(new CountingMode());
 		autoModeRunner.start();
 	}
@@ -86,14 +89,22 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit(){
 		autoModeRunner.stop();
+		driveTrain.zeroGyro();
+		autoModeRunner.chooseAutoMode(new TeleopGearHang(driveTrain, gearManip, visionTable));
 	}
 	
 	@Override
 	public void teleopPeriodic() {
 		
-		driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
+		if(joystick.X.isOffToOn()){
+			autoModeRunner.start();
+		}
+		else if(!joystick.X.isPressed()){
+			autoModeRunner.stop();
+			driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
 		
-		//gearManip.activate(joystick.A.isPressed());
+			gearManip.activate(joystick.START.isPressed());
+		}
 		//climb.up(joystick.RT.getFilteredAxis());
 		if(joystick.RB.isPressed()){
 			intakeRear.in(1);
@@ -148,6 +159,14 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void testPeriodic() {
 		
+	}
+	
+	public void networkTablesBroadcast(){
+		visionTable.putNumber(Constants.GEAR_INPUT_ANGLE_NAME, driveTrain.getGyroAngle());
+		visionTable.putNumber(Constants.TURRET_INPUT_ANGLE_NAME, turret.getCurrentAngle());
+		
+		SmartDashboard.putNumber("gear angle", visionTable.getNumber(Constants.GEAR_OUTPUT_ANGLE_NAME, 0));
+		SmartDashboard.putNumber("gear dist", visionTable.getNumber(Constants.GEAR_OUTPUT_DISTANCE_NAME, 0));
 	}
 }
 

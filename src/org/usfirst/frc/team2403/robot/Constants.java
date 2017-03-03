@@ -31,6 +31,7 @@ public class Constants {
 	/*DRIVETRAIN CONSTANTS*/
 	public static final double MAX_DRIVE_SPEED = .8;
 	public static final double MAX_DRIVE_TURN = .7;	
+	public static final double DRIVE_ENCODER_CONVERSION = 20.9528184;
 	
 	/*GEAR MANIPULATOR CONSTANTS*/
 	public static final double DOOR_OPEN_ANGLE = 55.0;
@@ -56,5 +57,12 @@ public class Constants {
 	/*NETWORK TABLES CONSTANTS*/
 	public static final String VISION_TABLE_NAME = "vision";
 	public static final String DASHBOARD_TABLE_NAME = "dashboard";
+	public static final String GEAR_INPUT_ANGLE_NAME = "gearPhotoAngle";
+	public static final String GEAR_OUTPUT_ANGLE_NAME = "gearNeededAngle";
+	public static final String GEAR_OUTPUT_DISTANCE_NAME = "gearDistance";
+	public static final String TURRET_INPUT_ANGLE_NAME = "fuelPhotoAngle";
+	public static final String TURRET_OUTPUT_ANGLE_NAME = "fuelNeededAngle";
+	public static final String TURRET_OUTPUT_RPM_NAME = "shooterRPM";
+	
 	
 }
