@@ -56,6 +56,8 @@ public class Robot extends IterativeRobot {
 		
 		CameraServer.getInstance().startAutomaticCapture();//.setResolution(1080, 1080);
 		
+		SmartDashboard.putNumber("wanted RPM", 0);
+		
 	}
 	@Override
 	public void robotPeriodic(){
@@ -149,7 +151,8 @@ public class Robot extends IterativeRobot {
 		
 		//turret.autoAim(joystick.A.isOnToOff());
 		turret.autoAim(true);
-		turret.shoot(joystick.RT.getFilteredAxis());
+		turret.autoShoot();
+		//turret.shoot(SmartDashboard.getNumber();
 	}
 	
 	@Override

@@ -35,8 +35,8 @@ public class DriveStraight implements Action {
 
 	@Override
 	public void start() {
-		drive.zeroGyro();
 		drive.resetEncoders();
+		drive.zeroGyro();
 	}
 
 	@Override

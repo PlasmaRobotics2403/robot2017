@@ -22,6 +22,9 @@ public class Lift {
 		liftRear.changeControlMode(CANTalon.TalonControlMode.Follower);
 		liftRear.reverseOutput(true);
 		liftRear.set(liftFront.getDeviceID());
+		
+		liftFront.setVoltageRampRate(Constants.GENERAL_RAMP_RATE);
+		liftRear.setVoltageRampRate(Constants.GENERAL_RAMP_RATE);
 	}
 	
 	

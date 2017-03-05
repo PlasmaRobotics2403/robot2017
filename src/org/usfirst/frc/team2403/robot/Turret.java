@@ -37,10 +37,25 @@ public class Turret {
 		
 		lazySusan.setProfile(0);
 		
-		//shooterLeft.changeControlMode(TalonControlMode.Speed);
-		//shooterRight.changeControlMode(TalonControlMode.Speed);
-		shooterLeft.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
-		shooterRight.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+		shooterLeft.changeControlMode(TalonControlMode.Speed);
+		shooterRight.changeControlMode(TalonControlMode.Speed);
+		//shooterLeft.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+		//shooterRight.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+		
+		//shooterRight.setInverted(true);
+		//shooterRight.reverseSensor(true);
+		
+		shooterRight.setF(1023.0/(Constants.MAX_TURRET_RPM / Constants.RPM_PER_ENC_VEL));
+		shooterLeft.setF(1023.0/(Constants.MAX_TURRET_RPM / Constants.RPM_PER_ENC_VEL));
+		shooterRight.setP(.1);
+		shooterLeft.setP(.1);
+		shooterRight.setD(0);
+		shooterLeft.setD(0);
+		shooterRight.setI(.0005);
+		shooterLeft.setI(.0005);
+		shooterRight.setVoltageRampRate(24);
+		shooterLeft.setVoltageRampRate(24);
+		//shooterRight.rever;
 		
 		//lazySusan.setPID(.3, 0, 0, 0, 0, 3.0, 0);
 		//lazySusan.setCloseLoopRampRate(3.0);
@@ -55,10 +70,27 @@ public class Turret {
 	}
 	
 	public void shoot(double speed){
-		shooterLeft.set(-speed);
-		shooterRight.set(speed);
-		SmartDashboard.putNumber("shoot speed left", shooterLeft.getSpeed());
-		SmartDashboard.putNumber("shoot speed right", shooterRight.getSpeed());
+		double targetSpeed = speed/* * Constants.MAX_TURRET_RPM */ * (1.0/Constants.ENCODER_UPDATES_PER_MIN) * Constants.ENCODER_COUNTS_PER_ROT;
+		if(targetSpeed == 0){
+			shooterLeft.clearIAccum();
+			shooterRight.clearIAccum();
+		}
+		shooterLeft.set(targetSpeed);
+		shooterRight.set(-targetSpeed);
+		SmartDashboard.putNumber("shoot speed left", shooterLeft.getSpeed()*Constants.RPM_PER_ENC_VEL);
+		SmartDashboard.putNumber("shoot speed right", shooterRight.getSpeed()*Constants.RPM_PER_ENC_VEL);
+		SmartDashboard.putNumber("right err", shooterRight.getError()*Constants.RPM_PER_ENC_VEL);
+		SmartDashboard.putNumber("left err", shooterLeft.getError()*Constants.RPM_PER_ENC_VEL);
+		SmartDashboard.putNumber("left I Acc", shooterLeft.GetIaccum());
+		SmartDashboard.putNumber("right I Acc", shooterRight.GetIaccum());
+		SmartDashboard.putNumber("ramp", shooterLeft.getCloseLoopRampRate());
+		
+	}
+	
+	public void autoShoot(){
+		double rpm = table.getNumber(Constants.TURRET_OUTPUT_RPM_NAME, 0);
+		shoot(rpm);
+		SmartDashboard.putNumber("wanted RPM", rpm);
 	}
 	
 

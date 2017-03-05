@@ -53,6 +53,7 @@ public class Constants {
 	public static final double MAX_SPIN_SPEED = .5;
 	public static final int TURRET_ABS_ENC_OFFSET = -961;
 	public static final double TURRET_ROTS_PER_DEGREE = .0160048;
+	public static final double MAX_TURRET_RPM = 2650.0;
 	
 	/*NETWORK TABLES CONSTANTS*/
 	public static final String VISION_TABLE_NAME = "vision";
@@ -64,5 +65,10 @@ public class Constants {
 	public static final String TURRET_OUTPUT_ANGLE_NAME = "fuelNeededAngle";
 	public static final String TURRET_OUTPUT_RPM_NAME = "shooterRPM";
 	
-	
+	/*GENERAL CONSTANTS*/
+	public static final double TALON_POWER_MULTIPLIER = 1023.0;
+	public static final double ENCODER_COUNTS_PER_ROT = 4096.0;
+	public static final double ENCODER_UPDATES_PER_MIN = 600.0;
+	public static final double RPM_PER_ENC_VEL = Constants.ENCODER_UPDATES_PER_MIN / Constants.ENCODER_COUNTS_PER_ROT;
+	public static final double GENERAL_RAMP_RATE = 36.0;
 }

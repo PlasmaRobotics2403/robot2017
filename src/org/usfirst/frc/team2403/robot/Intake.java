@@ -16,7 +16,7 @@ public class Intake {
 	 */	
 	public Intake(int ID){
 		intake = new CANTalon(ID);
-
+		intake.setVoltageRampRate(Constants.GENERAL_RAMP_RATE);
 	}
 	
 	
