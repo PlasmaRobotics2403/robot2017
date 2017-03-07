@@ -1,8 +1,12 @@
 package org.usfirst.frc.team2403.robot;
 
+import org.opencv.core.*;
+import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team2403.robot.auto.modes.*;
 import org.usfirst.frc.team2403.robot.auto.util.*;
 import org.usfirst.frc.team2403.robot.controllers.*;
+
+import edu.wpi.cscore.*;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -54,7 +58,25 @@ public class Robot extends IterativeRobot {
 		
 		autoModeRunner = new AutoModeRunner();	
 		
-		CameraServer.getInstance().startAutomaticCapture();//.setResolution(1080, 1080);
+		//CameraServer.getInstance().startAutomaticCapture();//.setResolution(1080, 1080);
+		
+		new Thread(() -> {
+            CameraServer.getInstance().startAutomaticCapture();
+            
+            CvSink cvSink = CameraServer.getInstance().getVideo();
+            CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
+            
+            Mat source = new Mat();
+            Mat output = new Mat();
+            
+            while(!Thread.interrupted()) {
+                cvSink.grabFrame(source);
+            
+                Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
+                Imgproc.line(output, new Point(0,0), new Point(100,100), new Scalar(100, 0, 0), 4, 8, 0);
+                outputStream.putFrame(output);
+            }
+        }).start();
 		
 		SmartDashboard.putNumber("wanted RPM", 0);
 		
@@ -150,8 +172,8 @@ public class Robot extends IterativeRobot {
 		*/
 		
 		//turret.autoAim(joystick.A.isOnToOff());
-		turret.autoAim(true);
-		turret.autoShoot();
+		//turret.autoAim(true);
+		//turret.autoShoot();
 		//turret.shoot(SmartDashboard.getNumber();
 	}
 	
