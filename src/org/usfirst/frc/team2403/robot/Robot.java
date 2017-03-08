@@ -27,7 +27,7 @@ public class Robot extends IterativeRobot {
 	NetworkTable dashboardTable;
 	
 	AutoModeRunner autoModeRunner;
-	
+			
 	@Override
 	public void robotInit() {
 		NetworkTable.setUpdateRate(.01);
@@ -100,7 +100,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		driveTrain.zeroGyro();
-		autoModeRunner.chooseAutoMode(new CountingMode());
+		autoModeRunner.chooseAutoMode(new TestBackForth(driveTrain));
 		autoModeRunner.start();
 	}
 
@@ -129,7 +129,7 @@ public class Robot extends IterativeRobot {
 		
 			gearManip.activate(joystick.START.isPressed());
 		}
-		//climb.up(joystick.RT.getFilteredAxis());
+		climb.up(joystick.RT.getFilteredAxis());
 		if(joystick.RB.isPressed()){
 			intakeRear.in(1);
 			intakeFront.in(1);
@@ -186,12 +186,14 @@ public class Robot extends IterativeRobot {
 		
 	}
 	
+	
+	
 	public void networkTablesBroadcast(){
-		visionTable.putNumber(Constants.GEAR_INPUT_ANGLE_NAME, driveTrain.getGyroAngle());
-		visionTable.putNumber(Constants.TURRET_INPUT_ANGLE_NAME, turret.getCurrentAngle());
+		//visionTable.putNumber(Constants.GEAR_INPUT_ANGLE_NAME, driveTrain.getGyroAngle());
+		//visionTable.putNumber(Constants.TURRET_INPUT_ANGLE_NAME, turret.getCurrentAngle());
 		
-		SmartDashboard.putNumber("gear angle", visionTable.getNumber(Constants.GEAR_OUTPUT_ANGLE_NAME, 0));
-		SmartDashboard.putNumber("gear dist", visionTable.getNumber(Constants.GEAR_OUTPUT_DISTANCE_NAME, 0));
+		//SmartDashboard.putNumber("gear angle", visionTable.getNumber(Constants.GEAR_OUTPUT_ANGLE_NAME, 0));
+		//SmartDashboard.putNumber("gear dist", visionTable.getNumber(Constants.GEAR_OUTPUT_DISTANCE_NAME, 0));
 	}
 }
 

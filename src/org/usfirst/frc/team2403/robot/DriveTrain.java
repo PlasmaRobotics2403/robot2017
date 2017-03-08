@@ -6,9 +6,12 @@ import com.kauailabs.navx.frc.*;
 
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import jaci.pathfinder.Trajectory;
+import jaci.pathfinder.Trajectory.*;
 
 import com.ctre.*;
 import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.CANTalon.TrajectoryPoint;
 
 
 public class DriveTrain {
@@ -19,6 +22,8 @@ public class DriveTrain {
 	private CANTalon talonRightSlave;
 	
 	private AHRS navX;
+	
+	Notifier motionProfileUpdater;
 	
 	/**
 	*
@@ -52,17 +57,54 @@ public class DriveTrain {
 		talonLeft.reverseSensor(true);
 		
 		navX = new AHRS(SerialPort.Port.kMXP);
+		
+		class PeriodicRunnable implements java.lang.Runnable {
+		    public void run() {  talonLeft.processMotionProfileBuffer(); talonRight.processMotionProfileBuffer();    }
+		}
+		
+		motionProfileUpdater = new Notifier(new PeriodicRunnable());
 	}
 	
+	/* SENSOR METHODS */
 	public void resetEncoders(){
+		double dist = Math.abs(getDistance());
 		talonLeft.setPosition(0);
 		talonRight.setPosition(0);
+		while(Math.abs(getDistance()) > dist - 1 && Math.abs(getDistance()) > 1){
+			talonLeft.setPosition(0);
+			talonRight.setPosition(0);
+		}
 	}
 	
 	public double getDistance(){
 		return (toDistance(talonRight) + toDistance(talonLeft))/2;
 	}
-
+	
+	private static double toDistance(CANTalon talon){
+		return talon.getPosition() * Constants.DRIVE_ENCODER_CONVERSION;
+	}
+	
+	public double getGyroAngle(){
+		return navX.getYaw();
+	}
+	
+	public void zeroGyro(){
+		navX.zeroYaw();
+	}
+	
+	/* CHANGE TALON MODES */
+	
+	public void setMotionProfileMode(){
+		talonLeft.changeControlMode(CANTalon.TalonControlMode.MotionProfile);
+		talonRight.changeControlMode(CANTalon.TalonControlMode.MotionProfile);
+	}
+	
+	public void setNormalDriveMode(){
+		talonLeft.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		talonRight.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+	}
+	
+	/* DRIVING MODES */
 	/**
 	 * Drives robot based on FPS controls
 	 * 
@@ -132,10 +174,6 @@ public class DriveTrain {
 		
 		
 	}
-
-	public double toDistance(CANTalon talon){
-		return talon.getPosition() * Constants.DRIVE_ENCODER_CONVERSION;
-	}
 	
 	/**
 	*Tank drive for automated driving
@@ -175,13 +213,7 @@ public class DriveTrain {
 		autonTankDrive(0, 0);
 	}
 	
-	public double getGyroAngle(){
-		return navX.getYaw();
-	}
-	
-	public void zeroGyro(){
-		navX.zeroYaw();
-	}
+	/*FEEDBACK*/
 	
 	public void reportDriveData(){
 		SmartDashboard.putNumber("test", navX.getYaw());
@@ -189,7 +221,66 @@ public class DriveTrain {
 		SmartDashboard.putNumber("distanceR", toDistance(talonRight));
 		SmartDashboard.putNumber("distanceL", toDistance(talonLeft));
 	}
-
 	
+	
+	/*MOTION PROFILING*/
+	
+	private static TrajectoryPoint[] generatePoints(Trajectory t, boolean invert) {
+		TrajectoryPoint[] points = new TrajectoryPoint[t.length()];
+		for (int i = 0; i < points.length; i++) {
+			Segment s = t.get(i);
+			TrajectoryPoint point = new TrajectoryPoint();
+			point.position = s.position;
+			point.velocity = s.velocity * 60;
+			point.timeDurMs = (int) (s.dt * 1000.0);
+			point.profileSlotSelect = 1;
+			point.velocityOnly = false;
+			point.zeroPos = i == 0;
+			point.isLastPoint = i == t.length() - 1;
+
+			if (invert) {
+				point.position = -point.position;
+				point.velocity = -point.velocity;
+			}
+
+			points[i] = point;
+		}
+		return points;
+	}
+	
+	public void loadTrajectories(Trajectory left, Trajectory right){
+		setMotionProfileMode();
+		talonLeft.set(0);
+		talonRight.set(0);
+		talonLeft.clearMotionProfileTrajectories();
+		talonRight.clearMotionProfileTrajectories();
+		TrajectoryPoint[] trajectoryLeft = generatePoints(left, false);
+		TrajectoryPoint[] trajectoryRight = generatePoints(right, false);
+		for(int i = 0; i < trajectoryLeft.length; i++){
+			talonLeft.pushMotionProfileTrajectory(trajectoryLeft[i]);
+		}
+		for(int i = 0; i < trajectoryRight.length; i++){
+			talonRight.pushMotionProfileTrajectory(trajectoryRight[i]);
+		}
+	}
+	
+	public void startFollowing(){
+		setMotionProfileMode();
+		talonLeft.changeMotionControlFramePeriod(5);
+		talonRight.changeMotionControlFramePeriod(5);
+		motionProfileUpdater.startPeriodic(0.005);
+		while(talonLeft.getMotionProfileTopLevelBufferCount() < 3 || talonRight.getMotionProfileTopLevelBufferCount() < 3 ){
+		}
+		talonLeft.set(1);
+		talonRight.set(1);
+	}
+	
+	public void stopFollowing(){
+		talonLeft.changeMotionControlFramePeriod(5);
+		talonRight.changeMotionControlFramePeriod(5);
+		motionProfileUpdater.startPeriodic(0.005);
+	}
+	
+
 
 }	
