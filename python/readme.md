@@ -1,9 +1,13 @@
 2017 FIRST Robotics Competition (FRC) FIRST Steamworks
+
 Raspberry Pi Based Vision Tracking
+
 FRC Team 2403 Plasma Robotics
+
 www.plasmarobotics.com
 
 This filesystem contains the code to FRC Team 2403 Plasma Robotics' Vision Tracking.
+
 In the 2017 game, FIRST Steamworks, robots can vision track various strips of retroreflective tape found on both the boiler,
 where fuel (plastic wiffle balls) can be shot, and the airship, where robots can place large plastic gears onto spring pegs.
 
