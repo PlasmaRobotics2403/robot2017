@@ -96,7 +96,7 @@ public class Turret {
 
 	
 	int lastSide = 0;
-	public void testTurn(double angle){
+	public void spinToAngle(double angle){
 		double rots = toNumRotations(angle);
 		double err = angle - toAngle(lazySusan.getPosition());
 		int side = (int)(err/Math.abs(err));
@@ -126,7 +126,7 @@ public class Turret {
 		if(doUpdate){
 			angle = table.getNumber(Constants.TURRET_OUTPUT_ANGLE_NAME, 0);
 		}
-		testTurn(angle);
+		spinToAngle(angle);
 	}
 	
 	public static double toNumRotations(double angle){
@@ -141,6 +141,8 @@ public class Turret {
 		return toAngle(lazySusan.getPosition());
 	}
 	
-	
+	public double getShooterSpeed(){
+		return shooterLeft.getSpeed()*Constants.RPM_PER_ENC_VEL;
+	}
 	
 }

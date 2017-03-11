@@ -85,6 +85,9 @@ public class Robot extends IterativeRobot {
 			autoModes[i] = new Nothing();
 		}
 		autoModes[1] = new CrossBaseline(driveTrain);
+		autoModes[2] = new CenterGearHang(driveTrain, gearManip);
+		autoModes[3] = new ShootFuelCenter(true, turret, lift, intakeFront, intakeRear);
+		autoModes[4] = new ShootFuelCenter(false, turret, lift, intakeFront, intakeRear);
 		autoModeSelection = 0;
 		
 	}
@@ -154,8 +157,8 @@ public class Robot extends IterativeRobot {
 			lift.up(0);
 		}
 		
-		//turret.autoAim(true);
 		
+		turret.spinToAngle(0);
 		turret.shoot(joystick2.RT.getFilteredAxis() * Constants.MAX_TURRET_RPM);
 
 	}
