@@ -26,18 +26,18 @@ public class GearManipulator {
 		pusherRight = new Servo(pushRightID);		
 	}
 	
-	public void newBotActivate(boolean open){
+	public void activateNoDelay(boolean open){
 		if(open){
-			doorLeft.setAngle(0);
-			doorRight.setAngle(90);
-			pusherLeft.setAngle(0);
-			pusherRight.setAngle(90);
-		}
-		else{
 			doorLeft.setAngle(90);
 			doorRight.setAngle(0);
 			pusherLeft.setAngle(90);
 			pusherRight.setAngle(0);
+		}
+		else{
+			doorLeft.setAngle(0);
+			doorRight.setAngle(90);
+			pusherLeft.setAngle(0);
+			pusherRight.setAngle(90);
 		}
 	}
 	
@@ -45,27 +45,27 @@ public class GearManipulator {
 	double timeToPush = 0;
 	public void activate(boolean open){
 		if(open){
-			doorLeft.setAngle(Constants.DOOR_OPEN_ANGLE);
-			doorRight.setAngle(Constants.MAX_ANGLE - Constants.DOOR_OPEN_ANGLE);
+			doorLeft.setAngle(90);
+			doorRight.setAngle(0);
 			
 			if(wasOpen == false){
 				timeToPush = Timer.getFPGATimestamp() + .1;
 			}
 			
 			if(Timer.getFPGATimestamp() > timeToPush){
-				pusherLeft.setAngle(Constants.PUSH_ANGLE);
-				pusherRight.setAngle(Constants.MAX_ANGLE - Constants.PUSH_ANGLE);
+				pusherLeft.setAngle(90);
+				pusherRight.setAngle(0);
 			}
 			else{
-				pusherLeft.setAngle(Constants.PUSH_START_ANGLE);
-				pusherRight.setAngle(Constants.MAX_ANGLE - Constants.PUSH_START_ANGLE);
+				pusherLeft.setAngle(0);
+				pusherRight.setAngle(90);
 			}
 		}
 		else{
-			doorLeft.setAngle(Constants.DOOR_START_ANGLE);
-			doorRight.setAngle(Constants.MAX_ANGLE - Constants.DOOR_START_ANGLE);
-			pusherLeft.setAngle(Constants.PUSH_START_ANGLE);
-			pusherRight.setAngle(Constants.MAX_ANGLE - Constants.PUSH_START_ANGLE);
+			doorLeft.setAngle(0);
+			doorRight.setAngle(90);
+			pusherLeft.setAngle(0);
+			pusherRight.setAngle(90);
 		}
 		wasOpen = open;
 		

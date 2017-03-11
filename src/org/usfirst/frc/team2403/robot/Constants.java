@@ -23,14 +23,14 @@ public class Constants {
 	public static final int TALON_CLIMB_R_ID = 13;
 	
 	/* SERVO PORT CONSTANTS */
-	public static final int GEAR_DOOR_L_PORT = 2;
+	public static final int GEAR_DOOR_L_PORT = 3;
 	public static final int GEAR_DOOR_R_PORT = 0;
-	public static final int GEAR_PUSH_L_PORT = 3;
+	public static final int GEAR_PUSH_L_PORT = 2;
 	public static final int GEAR_PUSH_R_PORT = 1;
 	
 	/*DRIVETRAIN CONSTANTS*/
-	public static final double MAX_DRIVE_SPEED = .8;
-	public static final double MAX_DRIVE_TURN = .7;	
+	public static final double MAX_DRIVE_SPEED = .9;
+	public static final double MAX_DRIVE_TURN = .9;	
 	public static final double DRIVE_ENCODER_CONVERSION = 20.9528184;
 	
 	/*GEAR MANIPULATOR CONSTANTS*/

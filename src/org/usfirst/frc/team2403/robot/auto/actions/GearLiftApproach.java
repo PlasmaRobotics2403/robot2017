@@ -7,7 +7,6 @@ import org.usfirst.frc.team2403.robot.Constants;
 import org.usfirst.frc.team2403.robot.DriveTrain;
 import org.usfirst.frc.team2403.robot.auto.util.Action;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 /**

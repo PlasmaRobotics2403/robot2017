@@ -1,12 +1,9 @@
 package org.usfirst.frc.team2403.robot;
 
-import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team2403.robot.auto.modes.*;
 import org.usfirst.frc.team2403.robot.auto.util.*;
 import org.usfirst.frc.team2403.robot.controllers.*;
 
-import edu.wpi.cscore.*;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,6 +24,9 @@ public class Robot extends IterativeRobot {
 	NetworkTable dashboardTable;
 	
 	AutoModeRunner autoModeRunner;
+	
+	AutoMode[] autoModes;
+	int autoModeSelection;
 			
 	@Override
 	public void robotInit() {
@@ -58,8 +58,8 @@ public class Robot extends IterativeRobot {
 		
 		autoModeRunner = new AutoModeRunner();	
 		
-		//CameraServer.getInstance().startAutomaticCapture();//.setResolution(1080, 1080);
-		
+		CameraServer.getInstance().startAutomaticCapture();//.setResolution(1080, 1080);
+		/*
 		new Thread(() -> {
             CameraServer.getInstance().startAutomaticCapture();
             
@@ -77,8 +77,15 @@ public class Robot extends IterativeRobot {
                 outputStream.putFrame(output);
             }
         }).start();
-		
+		*/
 		SmartDashboard.putNumber("wanted RPM", 0);
+		
+		autoModes = new AutoMode[10];
+		for(int i = 0; i < autoModes.length; i++){
+			autoModes[i] = new Nothing();
+		}
+		autoModes[1] = new CrossBaseline(driveTrain);
+		autoModeSelection = 0;
 		
 	}
 	@Override
@@ -90,6 +97,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledInit(){
 		autoModeRunner.stop();
+		autoModeSelection = (int)SmartDashboard.getNumber("Auto Mode", 0);
 	}
 	
 	@Override
@@ -100,41 +108,34 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		driveTrain.zeroGyro();
-		autoModeRunner.chooseAutoMode(new TestBackForth(driveTrain));
+		autoModeSelection = (autoModeSelection >= autoModes.length) ? 0 : autoModeSelection;
+		autoModeSelection = (autoModeSelection < 0) ? 0 : autoModeSelection;
+		autoModeRunner.chooseAutoMode(autoModes[autoModeSelection]);
 		autoModeRunner.start();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		
-
 	}
 	
 	@Override
 	public void teleopInit(){
 		autoModeRunner.stop();
 		driveTrain.zeroGyro();
-		autoModeRunner.chooseAutoMode(new TeleopGearHang(driveTrain, gearManip, visionTable));
 	}
 	
 	@Override
-	public void teleopPeriodic() {
+	public void teleopPeriodic() {	
 		
-		if(joystick.X.isOffToOn()){
-			autoModeRunner.start();
-		}
-		else if(!joystick.X.isPressed()){
-			autoModeRunner.stop();
-			driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
-		
-			gearManip.activate(joystick.START.isPressed());
-		}
+		driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
+		gearManip.activate(joystick.START.isPressed());
 		climb.up(joystick.RT.getFilteredAxis());
-		if(joystick.RB.isPressed()){
+		
+		if(joystick2.RB.isPressed()){
 			intakeRear.in(1);
 			intakeFront.in(1);
 		}
-		else if(joystick.LB.isPressed()){
+		else if(joystick2.LB.isPressed()){
 			intakeRear.out(1);
 			intakeFront.out(1);
 		}
@@ -143,38 +144,20 @@ public class Robot extends IterativeRobot {
 			intakeFront.in(0);
 		}
 		
-		if(joystick.A.isPressed()){
+		if(joystick2.A.isPressed()){
 			lift.up(1);
 		}
-		else if(joystick.Y.isPressed()){
+		else if(joystick2.Y.isPressed()){
 			lift.down(1);
 		}
 		else{
 			lift.up(0);
 		}
 		
-		//turret.pivot(joystick.LeftX.getFilteredAxis());
-		/*
-		if(joystick.A.isPressed()){
-			turret.testTurn(45);
-		}
-		else{
-			turret.testTurn(0);
-		}
-		*/
-		/*
-		if(joystick.Y.isOffToOn()){
-			CameraServer.getInstance().removeCamera("USB Camera 0");
-		}
-		else if(joystick.Y.isOnToOff()){
-			CameraServer.getInstance().startAutomaticCapture();
-		}
-		*/
-		
-		//turret.autoAim(joystick.A.isOnToOff());
 		//turret.autoAim(true);
-		//turret.autoShoot();
-		//turret.shoot(SmartDashboard.getNumber();
+		
+		turret.shoot(joystick2.RT.getFilteredAxis() * Constants.MAX_TURRET_RPM);
+
 	}
 	
 	@Override
@@ -183,7 +166,6 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void testPeriodic() {
-		
 	}
 	
 	
@@ -196,4 +178,3 @@ public class Robot extends IterativeRobot {
 		//SmartDashboard.putNumber("gear dist", visionTable.getNumber(Constants.GEAR_OUTPUT_DISTANCE_NAME, 0));
 	}
 }
-

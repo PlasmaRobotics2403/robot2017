@@ -220,6 +220,8 @@ public class DriveTrain {
 		SmartDashboard.putNumber("encoder", talonRight.getPosition());
 		SmartDashboard.putNumber("distanceR", toDistance(talonRight));
 		SmartDashboard.putNumber("distanceL", toDistance(talonLeft));
+		SmartDashboard.putNumber("gyro", getGyroAngle());
+		//DriverStation.reportWarning("" + getGyroAngle(), false);
 	}
 	
 	

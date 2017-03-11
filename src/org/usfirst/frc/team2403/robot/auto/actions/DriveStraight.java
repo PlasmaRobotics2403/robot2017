@@ -5,9 +5,6 @@ package org.usfirst.frc.team2403.robot.auto.actions;
 
 import org.usfirst.frc.team2403.robot.DriveTrain;
 import org.usfirst.frc.team2403.robot.auto.util.Action;
-
-import edu.wpi.first.wpilibj.DriverStation;
-
 /**
  *
  */
