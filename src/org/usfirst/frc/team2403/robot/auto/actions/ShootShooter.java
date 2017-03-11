@@ -51,14 +51,14 @@ public class ShootShooter implements Action {
 	public void update() {
 		turret.spinToAngle(angle);
 		turret.shoot(rpm);
-		if(!hasStartedFiring && Math.abs(turret.getShooterSpeed() - rpm) < 20 && Math.abs(turret.getCurrentAngle() - angle) < 1){
+		if(!hasStartedFiring && Math.abs(turret.getShooterSpeed() - rpm) < 100 && Math.abs(turret.getCurrentAngle() - angle) < 1){
 			startTime = Timer.getFPGATimestamp();
 			hasStartedFiring = true;
 		}
 		if(hasStartedFiring){
-			lift.up(1);
-			frontIntake.in(1);
-			backIntake.in(1);
+			lift.down(1);
+			frontIntake.in(.5);
+			backIntake.in(.5);
 		}
 	}
 

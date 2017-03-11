@@ -97,6 +97,7 @@ public class Turret {
 	
 	int lastSide = 0;
 	public void spinToAngle(double angle){
+		lazySusan.changeControlMode(TalonControlMode.PercentVbus);
 		double rots = toNumRotations(angle);
 		double err = angle - toAngle(lazySusan.getPosition());
 		int side = (int)(err/Math.abs(err));
@@ -143,6 +144,11 @@ public class Turret {
 	
 	public double getShooterSpeed(){
 		return shooterLeft.getSpeed()*Constants.RPM_PER_ENC_VEL;
+	}
+	
+	public void spin(double axis){
+		lazySusan.changeControlMode(TalonControlMode.PercentVbus);
+		lazySusan.set(axis);
 	}
 	
 }

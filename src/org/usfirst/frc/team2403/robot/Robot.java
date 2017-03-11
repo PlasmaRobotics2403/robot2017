@@ -88,8 +88,10 @@ public class Robot extends IterativeRobot {
 		autoModes[2] = new CenterGearHang(driveTrain, gearManip);
 		autoModes[3] = new ShootFuelCenter(true, turret, lift, intakeFront, intakeRear);
 		autoModes[4] = new ShootFuelCenter(false, turret, lift, intakeFront, intakeRear);
+		autoModes[5] = new FuelBaseline(true, turret, lift, intakeFront, intakeRear, driveTrain);
+		autoModes[6] = new FuelBaseline(false, turret, lift, intakeFront, intakeRear, driveTrain);
 		autoModeSelection = 0;
-		
+		SmartDashboard.putNumber("Auto Mode", 0);
 	}
 	@Override
 	public void robotPeriodic(){
@@ -100,12 +102,12 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledInit(){
 		autoModeRunner.stop();
-		autoModeSelection = (int)SmartDashboard.getNumber("Auto Mode", 0);
+		
 	}
 	
 	@Override
 	public void disabledPeriodic(){
-		
+		autoModeSelection = (int)SmartDashboard.getNumber("Auto Mode", 0);
 	}
 		
 	@Override
@@ -158,7 +160,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		
-		turret.spinToAngle(0);
+		turret.spin(joystick2.LeftX.getFilteredAxis());
 		turret.shoot(joystick2.RT.getFilteredAxis() * Constants.MAX_TURRET_RPM);
 
 	}
