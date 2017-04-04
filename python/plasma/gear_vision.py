@@ -42,7 +42,7 @@ if args.get("debug", False):
         debug=True
 
 if not args.get("noNetworkTable", False):
-        NetworkTable.setIPAddress('roborio-2403-FRC.local')
+        NetworkTable.setIPAddress('10.24.3.2')
         NetworkTable.setClientMode()
         NetworkTable.setUpdateRate(0.01)
         NetworkTable.initialize()
@@ -147,11 +147,20 @@ while True:
                 x1, y1, w1, h1 = cv2.boundingRect(contours[1])
                 #print ("w = " + str(w) + ", h = " + str(h) + "w1 = " + str(w1) + ", h1 = " + str(h1))
                 if h > 10 and w > 10 and h1 > 10 and w1 > 10:
-                        #print ("w = " + str(w) + ", h = " + str(h) + "w1 = " + str(w1) + ", h1 = " + str(h1))                     
-                        targetCntr = (x1 + w1 - x)/2+x
-                        offCntr = targetCntr - 320
-                        inchOffset = 2 * offCntr / w
-                        angleOff = math.degrees(math.atan(inchOffset/estDist))
+                        #print ("w = " + str(w) + ", h = " + str(h) + "w1 = " + str(w1) + ", h1 = " + str(h1))
+                        print ("x = " + str(x) + " x1 = " + str(x1))
+                        if x > x1:
+                                xNew = x
+                                wNew = w
+                        else:
+                                xNew = x1
+                                wNew = w1
+                        targetCntr = xNew
+                        offCntr = float(targetCntr - 320)      #320
+                        inchOffset = 2 * offCntr / float(wNew)
+                        print('inchOffset = ' + str(inchOffset) + ' estDist = ' + str(estDist))
+                        angleOff = -1 * math.degrees(math.atan(float(inchOffset)/float(estDist)))
+                        print('angleOff = ' + str(angleOff))
                         if not args.get("noNetworkTable", False):
                                 realAngleOff = photoAngle - angleOff
                                 
@@ -164,11 +173,13 @@ while True:
                 
 
         if not args.get("noNetworkTable", False):
-                print("NEW Angle is off by: " + str(int(realAngleOff)) + " degrees")
-                table.putNumber('gearElevatorAngle', angleOff)
-                table.putNumber('gearNeededAngle', realAngleOff)
-                table.putNumber('gearDistance', estDist)
-                table.putNumber('gearFPS', lastFPS)
+                print("NEW Angle is off by: " + str(float(realAngleOff)) + " degrees")
+                table.putValue('gearElevatorAngle', float(angleOff))
+                table.putValue('test1', float(angleOff))
+                table.putValue('gearNeededAngle', float(realAngleOff))
+                table.putValue('gearDistance', float(estDist))
+                table.putValue('gearFPS', int(lastFPS))
+                #table.putValue('test', str('Yay'))
 
 
         if debug:

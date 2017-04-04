@@ -61,7 +61,7 @@ if args.get("debug", False):
     plasmalogo = pygame.image.load("logoBlackPurpleSmall.jpg")
 
 if not args.get("noNetworkTable", False):
-        NetworkTable.setIPAddress('roborio-2403-FRC.local')
+        NetworkTable.setIPAddress('10.24.3.2')
         NetworkTable.setClientMode()
         NetworkTable.setUpdateRate(0.01)
         NetworkTable.initialize()
@@ -164,7 +164,7 @@ while True:
         print("ShooterVision")
     #calculate FPS
     if time.time() - starttime > 1:
-        print ("FPS: " +str(loopcnt))
+        print ("FPS: " +str(loopcnt) + "   ||  Last Angle: %.2f degrees" % angleOff + "  ||  Boiler Distance (m): %.2f" % realDist + "  ||  Nic is feeding me %.2f" % photoAngle + " degrees.")
         lastFPS=loopcnt
         loopcnt=0
         starttime=time.time()
@@ -174,7 +174,7 @@ while True:
     shootVelocity=0
     v = -1
     rpm = -1
-    flywheelEfficiency = 0.4
+    flywheelEfficiency = 0.465
 
     if len(contours) > 1:
 
@@ -242,7 +242,7 @@ while True:
                                                                 v = rpm * 0.0984 * 2 * math.pi / 60 * flywheelEfficiency
                                                                 targetCntr = (w0)/2+x0
                                                                 #print("Target Center:" + str(targetCntr))
-                                                                offCntr = targetCntr - 320 + 60 + shootAngleAdjustment
+                                                                offCntr = targetCntr - 320 + 150 + shootAngleAdjustment
                                                                 #print("Is off center by: " + str(offCntr) + " pixels")
                                                                 inchOffset = 15 * offCntr / w0
                                                                 angleOff = math.degrees(math.atan(inchOffset/dist))
