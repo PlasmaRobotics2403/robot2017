@@ -32,6 +32,7 @@ public class Constants {
 	public static final double MAX_DRIVE_SPEED = .9;
 	public static final double MAX_DRIVE_TURN = .9;	
 	public static final double DRIVE_ENCODER_CONVERSION = 20.9528184;
+	public static final double DRIVE_WHEEL_WIDTH = 27;
 	
 	/*GEAR MANIPULATOR CONSTANTS*/
 	public static final double DOOR_OPEN_ANGLE = 55.0;

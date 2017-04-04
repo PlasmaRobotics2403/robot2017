@@ -23,6 +23,8 @@ public class DriveTrain {
 	
 	private AHRS navX;
 	
+	private double gyroAngle;
+	
 	Notifier motionProfileUpdater;
 	
 	/**
@@ -56,13 +58,17 @@ public class DriveTrain {
 		talonRight.setInverted(true);
 		talonLeft.reverseSensor(true);
 		
-		navX = new AHRS(SerialPort.Port.kMXP);
+		navX = new AHRS(SPI.Port.kMXP);
 		
+		/*
 		class PeriodicRunnable implements java.lang.Runnable {
 		    public void run() {  talonLeft.processMotionProfileBuffer(); talonRight.processMotionProfileBuffer();    }
 		}
 		
 		motionProfileUpdater = new Notifier(new PeriodicRunnable());
+		*/
+		
+		gyroAngle = 0;
 	}
 	
 	/* SENSOR METHODS */
@@ -80,12 +86,20 @@ public class DriveTrain {
 		return (toDistance(talonRight) + toDistance(talonLeft))/2;
 	}
 	
+	public double getLeftDistance(){
+		return toDistance(talonLeft);
+	}
+	
 	private static double toDistance(CANTalon talon){
 		return talon.getPosition() * Constants.DRIVE_ENCODER_CONVERSION;
 	}
 	
+	public void updateGyro(){
+		gyroAngle = navX.getYaw();
+	}
+	
 	public double getGyroAngle(){
-		return navX.getYaw();
+		return gyroAngle;
 	}
 	
 	public void zeroGyro(){
@@ -117,7 +131,7 @@ public class DriveTrain {
 	public void FPSDrive(PlasmaAxis forwardAxis, PlasmaAxis turnAxis){
 		
 		double forwardVal = forwardAxis.getFilteredAxis() * Math.abs(forwardAxis.getFilteredAxis());
-		double turnVal = turnAxis.getFilteredAxis() * Math.abs(turnAxis.getFilteredAxis());
+		double turnVal = turnAxis.getFilteredAxis() * Math.abs(turnAxis.getFilteredAxis()) * Math.abs(turnAxis.getFilteredAxis());
 		
 		FPSDrive(forwardVal, turnVal);
 		
@@ -163,7 +177,7 @@ public class DriveTrain {
 		else{
 			speedL = 0;
 			speedR = 0;
-			DriverStation.reportError("You've got two empty halves of coconut and you're bangin' 'em together. (Bug @ fps drive code - no case triggered)", false);
+			DriverStation.reportError("Bug @ fps drive code - no case triggered)", false);
 		}
 		
 		speedL *= Constants.MAX_DRIVE_SPEED;
@@ -197,15 +211,17 @@ public class DriveTrain {
 	}
 	
 	public void gyroStraight(double speed, double angle){
-		autonTankDrive(speed - 0.01*(navX.getYaw() - angle), speed + 0.01*(navX.getYaw() - angle));
+		autonTankDrive(speed - 0.01*(getGyroAngle() - angle), speed + 0.01*(getGyroAngle() - angle));
 	}
 	
 	public void pivotToAngle(double angle){
-		if(getGyroAngle() - angle > 0){
-			autonTankDrive(-.3, .3);
+		double angleDiff = getGyroAngle() - angle;
+		double speed = (Math.abs(angleDiff) < 10) ? (Math.abs(angleDiff) / 10.0) * 0.15 + 0.15 : .3;
+		if(angleDiff > 0){
+			autonTankDrive(-speed, speed);
 		}
 		else{
-			autonTankDrive(.3, -.3);
+			autonTankDrive(speed, -speed);
 		}
 	}
 	
@@ -215,12 +231,18 @@ public class DriveTrain {
 	
 	/*FEEDBACK*/
 	
+	/**
+	 * Prints drive data to the smart dashboard. This will probably be changed to the other dashboard when the custom dashboard works
+	 * 
+	 *
+	 * @author Nic A
+	 */
 	public void reportDriveData(){
-		SmartDashboard.putNumber("test", navX.getYaw());
 		SmartDashboard.putNumber("encoder", talonRight.getPosition());
 		SmartDashboard.putNumber("distanceR", toDistance(talonRight));
 		SmartDashboard.putNumber("distanceL", toDistance(talonLeft));
 		SmartDashboard.putNumber("gyro", getGyroAngle());
+		//DriverStation.reportWarning("" + navX.getLastSensorTimestamp(), false);
 		//DriverStation.reportWarning("" + getGyroAngle(), false);
 	}
 	

@@ -1,9 +1,12 @@
 package org.usfirst.frc.team2403.robot;
 
+import org.opencv.core.*;
+import org.opencv.imgproc.*;
 import org.usfirst.frc.team2403.robot.auto.modes.*;
 import org.usfirst.frc.team2403.robot.auto.util.*;
 import org.usfirst.frc.team2403.robot.controllers.*;
 
+import edu.wpi.cscore.*;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -58,26 +61,27 @@ public class Robot extends IterativeRobot {
 		
 		autoModeRunner = new AutoModeRunner();	
 		
-		CameraServer.getInstance().startAutomaticCapture();//.setResolution(1080, 1080);
-		/*
+		//CameraServer.getInstance().startAutomaticCapture();//.setResolution(1080, 1080);
+		
 		new Thread(() -> {
             CameraServer.getInstance().startAutomaticCapture();
             
             CvSink cvSink = CameraServer.getInstance().getVideo();
-            CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
+            CvSource outputStream = CameraServer.getInstance().putVideo("GearOverlay", 640, 480);
             
             Mat source = new Mat();
             Mat output = new Mat();
             
             while(!Thread.interrupted()) {
                 cvSink.grabFrame(source);
-            
-                Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
-                Imgproc.line(output, new Point(0,0), new Point(100,100), new Scalar(100, 0, 0), 4, 8, 0);
+                output = source.clone(); //resolution is 160 by 120 apparently
+                Imgproc.line(output, new Point(60,0), new Point(60,120), new Scalar(0, 0, 255), 2, 8, 0);
+                Imgproc.line(output, new Point(100,0), new Point(100,120), new Scalar(0, 0, 255), 2, 8, 0);
+                Imgproc.line(output, new Point(80,0), new Point(80,120), new Scalar(0, 255, 0), 1, 8, 0);
                 outputStream.putFrame(output);
             }
         }).start();
-		*/
+		
 		SmartDashboard.putNumber("wanted RPM", 0);
 		
 		autoModes = new AutoMode[10];
@@ -85,11 +89,9 @@ public class Robot extends IterativeRobot {
 			autoModes[i] = new Nothing();
 		}
 		autoModes[1] = new CrossBaseline(driveTrain);
-		autoModes[2] = new CenterGearHang(driveTrain, gearManip);
+		autoModes[2] = new CenterGear(driveTrain, gearManip, visionTable);
 		autoModes[3] = new ShootFuelCenter(true, turret, lift, intakeFront, intakeRear);
 		autoModes[4] = new ShootFuelCenter(false, turret, lift, intakeFront, intakeRear);
-		autoModes[5] = new FuelBaseline(true, turret, lift, intakeFront, intakeRear, driveTrain);
-		autoModes[6] = new FuelBaseline(false, turret, lift, intakeFront, intakeRear, driveTrain);
 		autoModeSelection = 0;
 		SmartDashboard.putNumber("Auto Mode", 0);
 	}
@@ -97,6 +99,7 @@ public class Robot extends IterativeRobot {
 	public void robotPeriodic(){
 		networkTablesBroadcast();
 		driveTrain.reportDriveData();
+		driveTrain.updateGyro();
 	}
 	
 	@Override
@@ -108,6 +111,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledPeriodic(){
 		autoModeSelection = (int)SmartDashboard.getNumber("Auto Mode", 0);
+		driveTrain.zeroGyro();
 	}
 		
 	@Override
@@ -133,9 +137,9 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {	
 		
 		driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
-		gearManip.activate(joystick.START.isPressed());
+		gearManip.activate(joystick.START.isPressed(), joystick.X.isToggledOn());
 		climb.up(joystick.RT.getFilteredAxis());
-		
+		/*
 		if(joystick2.RB.isPressed()){
 			intakeRear.in(1);
 			intakeFront.in(1);
@@ -162,6 +166,7 @@ public class Robot extends IterativeRobot {
 		
 		turret.spin(joystick2.LeftX.getFilteredAxis());
 		turret.shoot(joystick2.RT.getFilteredAxis() * Constants.MAX_TURRET_RPM);
+		*/
 
 	}
 	
@@ -170,16 +175,77 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void testPeriodic() {
+	public void testPeriodic() {		
+		gearManip.activate(false, false);
+		if(joystick.RB.isPressed()){
+			intakeRear.in(1);
+			intakeFront.in(1);
+		}
+		else if(joystick.LB.isPressed()){
+			intakeRear.out(1);
+			intakeFront.out(1);
+		}
+		else{
+			intakeRear.in(0);
+			intakeFront.in(0);
+		}
+		
+		if(joystick.A.isPressed()){
+			lift.up(1);
+		}
+		else if(joystick.Y.isPressed()){
+			lift.down(1);
+		}
+		else{
+			lift.up(0);
+		}
+		
+		
+		//turret.spin(joystick.LeftX.getFilteredAxis());
+		//turret.shoot(joystick.RT.getFilteredAxis() * Constants.MAX_TURRET_RPM);
+		
+		turret.autoAim();
+		if(joystick.RT.isPressed()){
+			turret.autoShoot();
+		}
+		else{
+			turret.shoot(0);
+		}
+		
 	}
 	
-	
+	public void outreachMode(){
+		if(joystick.RT.isPressed()){
+			turret.shoot(joystick.RT.getFilteredAxis() * Constants.MAX_TURRET_RPM);
+			intakeRear.in(1);
+			intakeFront.in(1);
+			lift.down(1);
+		}
+		else if(joystick.A.isPressed()){
+			turret.shoot(-100);
+			intakeRear.in(0);
+			intakeFront.in(0);
+			lift.up(1);
+		}
+		else{
+			turret.shoot(0);
+			intakeRear.in(0);
+			intakeFront.in(0);
+			lift.down(0);
+		}
+		turret.spin(joystick.LeftX.getFilteredAxis());
+		gearManip.activate(false, false);
+	}
 	
 	public void networkTablesBroadcast(){
-		//visionTable.putNumber(Constants.GEAR_INPUT_ANGLE_NAME, driveTrain.getGyroAngle());
-		//visionTable.putNumber(Constants.TURRET_INPUT_ANGLE_NAME, turret.getCurrentAngle());
+		visionTable.putNumber(Constants.GEAR_INPUT_ANGLE_NAME, driveTrain.getGyroAngle());
+		visionTable.putNumber(Constants.TURRET_INPUT_ANGLE_NAME, turret.getCurrentAngle());
 		
-		//SmartDashboard.putNumber("gear angle", visionTable.getNumber(Constants.GEAR_OUTPUT_ANGLE_NAME, 0));
-		//SmartDashboard.putNumber("gear dist", visionTable.getNumber(Constants.GEAR_OUTPUT_DISTANCE_NAME, 0));
+		SmartDashboard.putNumber("gear angle", visionTable.getNumber(Constants.GEAR_OUTPUT_ANGLE_NAME, 0));
+		SmartDashboard.putNumber("gear dist", visionTable.getNumber(Constants.GEAR_OUTPUT_DISTANCE_NAME, 0));
+		
+		SmartDashboard.putNumber("current angle", visionTable.getNumber(Constants.TURRET_INPUT_ANGLE_NAME, 0));
+		SmartDashboard.putNumber("fuel angle", visionTable.getNumber(Constants.TURRET_OUTPUT_ANGLE_NAME, 0));
+		SmartDashboard.putNumber("fuel rpm", visionTable.getNumber(Constants.TURRET_OUTPUT_RPM_NAME, 0));
 	}
 }

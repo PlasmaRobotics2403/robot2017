@@ -4,6 +4,7 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -16,6 +17,9 @@ public class Turret {
 	private CANTalon lazySusan;
 	NetworkTable table;
 	//private Encoder enc;
+	
+	private boolean isMovingFast;
+	private double rpm;
 	
 	/**
 	 * Constructor for turret object
@@ -57,11 +61,13 @@ public class Turret {
 		shooterLeft.setVoltageRampRate(24);
 		//shooterRight.rever;
 		
-		//lazySusan.setPID(.3, 0, 0, 0, 0, 3.0, 0);
-		//lazySusan.setCloseLoopRampRate(3.0);
-		//lazySusan.setPID(.1, .0002, 2, 0, 0, 0, 1);
+		lazySusan.setPID(.5, 0, 0, 0, 0, 0, 0);
+		lazySusan.setCloseLoopRampRate(0);
+		lazySusan.setPID(.1, .002, 2, 0, 0, 0, 1);
 		
 		table = visionTable;
+		isMovingFast = false;
+		rpm = 0;
 	}
 	
 	public void pivot(double speed){
@@ -70,6 +76,8 @@ public class Turret {
 	}
 	
 	public void shoot(double speed){
+		shooterLeft.changeControlMode(TalonControlMode.Speed);
+		shooterRight.changeControlMode(TalonControlMode.Speed);
 		double targetSpeed = speed/* * Constants.MAX_TURRET_RPM */ * (1.0/Constants.ENCODER_UPDATES_PER_MIN) * Constants.ENCODER_COUNTS_PER_ROT;
 		if(targetSpeed == 0){
 			shooterLeft.clearIAccum();
@@ -88,7 +96,8 @@ public class Turret {
 	}
 	
 	public void autoShoot(){
-		double rpm = table.getNumber(Constants.TURRET_OUTPUT_RPM_NAME, 0);
+		double tempRPM = table.getNumber(Constants.TURRET_OUTPUT_RPM_NAME, 0);
+		if(tempRPM != -1) rpm = tempRPM;
 		shoot(rpm);
 		SmartDashboard.putNumber("wanted RPM", rpm);
 	}
@@ -97,16 +106,20 @@ public class Turret {
 	
 	int lastSide = 0;
 	public void spinToAngle(double angle){
-		lazySusan.changeControlMode(TalonControlMode.PercentVbus);
+		if(lazySusan.getControlMode() != TalonControlMode.Position){
+			DriverStation.reportWarning("resetting mode", false);
+		}
+		
 		double rots = toNumRotations(angle);
 		double err = angle - toAngle(lazySusan.getPosition());
 		int side = (int)(err/Math.abs(err));
 		if(Math.abs(err) < 5){
 			lazySusan.setProfile(1);
+			isMovingFast = false;
 		}
 		else{
 			lazySusan.setProfile(0);
-			
+			isMovingFast = true;
 		}
 		if(Math.abs(err) < 0.5){
 			lazySusan.clearIAccum();
@@ -123,8 +136,8 @@ public class Turret {
 	}
 	
 	double angle = 0;
-	public void autoAim(boolean doUpdate){
-		if(doUpdate){
+	public void autoAim(){
+		if(!isMovingFast){
 			angle = table.getNumber(Constants.TURRET_OUTPUT_ANGLE_NAME, 0);
 		}
 		spinToAngle(angle);

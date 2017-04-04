@@ -19,10 +19,6 @@ public class Lift {
 		liftFront = new CANTalon(frontID);
 		liftRear = new CANTalon(rearID);
 		
-		liftRear.changeControlMode(CANTalon.TalonControlMode.Follower);
-		liftRear.reverseOutput(true);
-		liftRear.set(liftFront.getDeviceID());
-		
 		liftFront.setVoltageRampRate(Constants.GENERAL_RAMP_RATE);
 		liftRear.setVoltageRampRate(Constants.GENERAL_RAMP_RATE);
 	}
@@ -30,6 +26,7 @@ public class Lift {
 	
 	public void spin(double speed){
 		liftFront.set(speed * Constants.MAX_LIFT_SPEED);
+		liftRear.set(-speed * Constants.MAX_LIFT_SPEED);
 	}
 	
 	public void up(double speed){

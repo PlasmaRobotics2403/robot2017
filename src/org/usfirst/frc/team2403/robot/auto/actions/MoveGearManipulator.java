@@ -11,13 +11,17 @@ import edu.wpi.first.wpilibj.Timer;
 /**
  *
  */
-public class CloseGearManipulator implements Action {
+public class MoveGearManipulator implements Action {
 
 	GearManipulator gearManip;
 	double endTime;
+	boolean open;
+	boolean clamp;
 	
-	public CloseGearManipulator(GearManipulator gearManip){
+	public MoveGearManipulator(GearManipulator gearManip, boolean open, boolean clamp){
 		this.gearManip = gearManip;
+		this.open = open;
+		this.clamp = clamp;
 	}
 	
 	@Override
@@ -27,12 +31,12 @@ public class CloseGearManipulator implements Action {
 
 	@Override
 	public void start() {
-		endTime = Timer.getFPGATimestamp() + 1;
+		endTime = Timer.getFPGATimestamp() + .5;
 	}
 
 	@Override
 	public void update() {
-		gearManip.activate(false, false);
+		gearManip.activate(open, clamp);
 	}
 
 	@Override

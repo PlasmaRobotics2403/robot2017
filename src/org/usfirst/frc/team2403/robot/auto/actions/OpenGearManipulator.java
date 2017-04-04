@@ -27,13 +27,13 @@ public class OpenGearManipulator implements Action {
 
 	@Override
 	public void start() {
-		gearManip.activate(false);
+		gearManip.activate(false, false);
 		endTime = Timer.getFPGATimestamp() + 1;
 	}
 
 	@Override
 	public void update() {
-		gearManip.activate(true);
+		gearManip.activate(true, false);
 	}
 
 	@Override
