@@ -8,6 +8,7 @@ import org.usfirst.frc.team2403.robot.controllers.*;
 
 import edu.wpi.cscore.*;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -30,6 +31,8 @@ public class Robot extends IterativeRobot {
 	
 	AutoMode[] autoModes;
 	int autoModeSelection;
+	
+	boolean alliance; //true = red, false = blue
 			
 	@Override
 	public void robotInit() {
@@ -58,6 +61,8 @@ public class Robot extends IterativeRobot {
 							visionTable);
 		climb = new Climb(Constants.TALON_CLIMB_L_ID, 
 							Constants.TALON_CLIMB_R_ID);
+		
+		alliance = DriverStation.getInstance().getAlliance() == Alliance.Red;
 		
 		autoModeRunner = new AutoModeRunner();	
 		
@@ -92,6 +97,7 @@ public class Robot extends IterativeRobot {
 		autoModes[2] = new CenterGear(driveTrain, gearManip, visionTable);
 		autoModes[3] = new ShootFuelCenter(true, turret, lift, intakeFront, intakeRear);
 		autoModes[4] = new ShootFuelCenter(false, turret, lift, intakeFront, intakeRear);
+		autoModes[5] = new FuelTest(false, turret, lift, intakeFront, intakeRear);
 		autoModeSelection = 0;
 		SmartDashboard.putNumber("Auto Mode", 0);
 	}
@@ -110,7 +116,18 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void disabledPeriodic(){
-		autoModeSelection = (int)SmartDashboard.getNumber("Auto Mode", 0);
+		if((int)SmartDashboard.getNumber("Auto Mode", 0) != 0){
+			autoModeSelection = (int)SmartDashboard.getNumber("Auto Mode", 0);
+		}
+		else{
+			try{
+				autoModeSelection = Integer.parseInt(dashboardTable.getString("auto", "0"));
+			}
+			catch(NumberFormatException e){
+				DriverStation.reportError("Auto mode must be an int", false);
+				autoModeSelection = 0;
+			}
+		}
 		driveTrain.zeroGyro();
 	}
 		
@@ -135,39 +152,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopPeriodic() {	
-		
-		driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
-		gearManip.activate(joystick.START.isPressed(), joystick.X.isToggledOn());
-		climb.up(joystick.RT.getFilteredAxis());
-		/*
-		if(joystick2.RB.isPressed()){
-			intakeRear.in(1);
-			intakeFront.in(1);
-		}
-		else if(joystick2.LB.isPressed()){
-			intakeRear.out(1);
-			intakeFront.out(1);
-		}
-		else{
-			intakeRear.in(0);
-			intakeFront.in(0);
-		}
-		
-		if(joystick2.A.isPressed()){
-			lift.up(1);
-		}
-		else if(joystick2.Y.isPressed()){
-			lift.down(1);
-		}
-		else{
-			lift.up(0);
-		}
-		
-		
-		turret.spin(joystick2.LeftX.getFilteredAxis());
-		turret.shoot(joystick2.RT.getFilteredAxis() * Constants.MAX_TURRET_RPM);
-		*/
-
+		driver1Controls(joystick);
+		driver2Controls(joystick2);
 	}
 	
 	@Override
@@ -175,13 +161,23 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void testPeriodic() {		
+	public void testPeriodic() {
 		gearManip.activate(false, false);
-		if(joystick.RB.isPressed()){
+		driver2Controls(joystick);
+	}
+	
+	public void driver1Controls(PlasmaJoystick joy){
+		driveTrain.FPSDrive(joystick.LeftY, joystick.RightX);
+		gearManip.activate(joystick.START.isPressed(), joystick.X.isToggledOn());
+		climb.up(joystick.RT.getFilteredAxis());
+	}
+	
+	public void driver2Controls(PlasmaJoystick joy){
+		if(joy.RB.isPressed()){
 			intakeRear.in(1);
 			intakeFront.in(1);
 		}
-		else if(joystick.LB.isPressed()){
+		else if(joy.LB.isPressed()){
 			intakeRear.out(1);
 			intakeFront.out(1);
 		}
@@ -190,28 +186,29 @@ public class Robot extends IterativeRobot {
 			intakeFront.in(0);
 		}
 		
-		if(joystick.A.isPressed()){
-			lift.up(1);
-		}
-		else if(joystick.Y.isPressed()){
+		if(joy.A.isPressed()){
 			lift.down(1);
 		}
+		else if(joy.Y.isPressed()){
+			lift.up(1);
+		}
 		else{
-			lift.up(0);
+			lift.down(0);
 		}
 		
+		if(joy.L3.isPressed()){
+			turret.autoAim();
+		}
+		else{
+			turret.spin(joy.LeftX.getFilteredAxis());
+		}
 		
-		//turret.spin(joystick.LeftX.getFilteredAxis());
-		//turret.shoot(joystick.RT.getFilteredAxis() * Constants.MAX_TURRET_RPM);
-		
-		turret.autoAim();
-		if(joystick.RT.isPressed()){
+		if(joy.RT.isPressed()){
 			turret.autoShoot();
 		}
 		else{
 			turret.shoot(0);
 		}
-		
 	}
 	
 	public void outreachMode(){
@@ -219,19 +216,19 @@ public class Robot extends IterativeRobot {
 			turret.shoot(joystick.RT.getFilteredAxis() * Constants.MAX_TURRET_RPM);
 			intakeRear.in(1);
 			intakeFront.in(1);
-			lift.down(1);
+			lift.up(1);
 		}
 		else if(joystick.A.isPressed()){
 			turret.shoot(-100);
 			intakeRear.in(0);
 			intakeFront.in(0);
-			lift.up(1);
+			lift.down(1);
 		}
 		else{
 			turret.shoot(0);
 			intakeRear.in(0);
 			intakeFront.in(0);
-			lift.down(0);
+			lift.up(0);
 		}
 		turret.spin(joystick.LeftX.getFilteredAxis());
 		gearManip.activate(false, false);

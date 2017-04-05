@@ -13,10 +13,9 @@ import edu.wpi.first.wpilibj.Timer;
 /**
  *
  */
-public class ShootShooter implements Action {
+public class ShootShooterAuto implements Action {
 
-	double rpm;
-	double angle;
+	double angleHint;
 	double time;
 	Turret turret;
 	Lift lift;
@@ -24,22 +23,27 @@ public class ShootShooter implements Action {
 	Intake backIntake;
 	
 	double startTime;
-	boolean hasStartedFiring;
+	boolean readyToFire;
+	boolean hasHinted; 
+	boolean isAimed;
+	boolean isAtSpeed;
 	
-	public ShootShooter(double rpm, double angle, double time, Turret turret, Lift lift, Intake frontIntake, Intake backIntake){
-		this.rpm = rpm;
-		this.angle = angle;
+	public ShootShooterAuto(double angleHint, double time, Turret turret, Lift lift, Intake frontIntake, Intake backIntake){
+		this.angleHint = angleHint;
 		this.time = time;
 		this.turret = turret;
 		this.lift = lift;
 		this.frontIntake = frontIntake;
 		this.backIntake = backIntake;
-		hasStartedFiring = false;
+		readyToFire = false;
+		hasHinted = false;
+		isAimed = false;
+		isAtSpeed = false;
 	}
 	
 	@Override
 	public boolean isFinished() {
-		return hasStartedFiring && (Timer.getFPGATimestamp() > startTime + time);
+		return readyToFire && (Timer.getFPGATimestamp() > startTime + time);
 	}
 
 	@Override
@@ -49,14 +53,22 @@ public class ShootShooter implements Action {
 
 	@Override
 	public void update() {
-		turret.spinToAngle(angle);
-		turret.shoot(rpm);
-		if(!hasStartedFiring && Math.abs(turret.getShooterSpeed() - rpm) < 100 && Math.abs(turret.getCurrentAngle() - angle) < 1){
-			startTime = Timer.getFPGATimestamp();
-			hasStartedFiring = true;
+		if(!hasHinted){
+			hasHinted = turret.spinToAngle(angleHint);
+			turret.shoot(2000);
 		}
-		if(hasStartedFiring){
-			lift.down(1);
+		else{
+			isAimed = turret.autoAim();
+			isAtSpeed = turret.autoShoot();
+		}
+		
+		turret.autoShoot();
+		if(!readyToFire && isAtSpeed && isAimed){
+			startTime = Timer.getFPGATimestamp();
+			readyToFire = true;
+		}
+		if(readyToFire){
+			lift.up(1);
 			frontIntake.in(.5);
 			backIntake.in(.5);
 		}
@@ -64,7 +76,7 @@ public class ShootShooter implements Action {
 
 	@Override
 	public void end() {
-		lift.up(0);
+		lift.down(0);
 		frontIntake.in(0);
 		backIntake.in(0);
 		turret.shoot(0);

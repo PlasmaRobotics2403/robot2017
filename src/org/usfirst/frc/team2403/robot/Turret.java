@@ -4,7 +4,6 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -37,17 +36,12 @@ public class Turret {
 		lazySusan = new CANTalon(lazyID);
 		lazySusan.changeControlMode(TalonControlMode.Position);
 		lazySusan.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
-		lazySusan.setPulseWidthPosition(0);//lazySusan.getPulseWidthPosition() - Constants.TURRET_ABS_ENC_OFFSET);
+		lazySusan.setPulseWidthPosition(0);
 		
 		lazySusan.setProfile(0);
 		
 		shooterLeft.changeControlMode(TalonControlMode.Speed);
 		shooterRight.changeControlMode(TalonControlMode.Speed);
-		//shooterLeft.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
-		//shooterRight.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
-		
-		//shooterRight.setInverted(true);
-		//shooterRight.reverseSensor(true);
 		
 		shooterRight.setF(1023.0/(Constants.MAX_TURRET_RPM / Constants.RPM_PER_ENC_VEL));
 		shooterLeft.setF(1023.0/(Constants.MAX_TURRET_RPM / Constants.RPM_PER_ENC_VEL));
@@ -59,7 +53,6 @@ public class Turret {
 		shooterLeft.setI(.0005);
 		shooterRight.setVoltageRampRate(24);
 		shooterLeft.setVoltageRampRate(24);
-		//shooterRight.rever;
 		
 		lazySusan.setPID(.5, 0, 0, 0, 0, 0, 0);
 		lazySusan.setCloseLoopRampRate(0);
@@ -70,44 +63,20 @@ public class Turret {
 		rpm = 0;
 	}
 	
-	public void pivot(double speed){
-		lazySusan.set(-speed * Constants.MAX_SPIN_SPEED);
-		SmartDashboard.putNumber("turret angle", lazySusan.getPosition());
-	}
+	/* TURNING */
 	
-	public void shoot(double speed){
-		shooterLeft.changeControlMode(TalonControlMode.Speed);
-		shooterRight.changeControlMode(TalonControlMode.Speed);
-		double targetSpeed = speed/* * Constants.MAX_TURRET_RPM */ * (1.0/Constants.ENCODER_UPDATES_PER_MIN) * Constants.ENCODER_COUNTS_PER_ROT;
-		if(targetSpeed == 0){
-			shooterLeft.clearIAccum();
-			shooterRight.clearIAccum();
+	public void spin(double axis){
+		if(!lazySusan.getControlMode().equals(TalonControlMode.PercentVbus)){
+			lazySusan.changeControlMode(TalonControlMode.PercentVbus);
 		}
-		shooterLeft.set(targetSpeed);
-		shooterRight.set(-targetSpeed);
-		SmartDashboard.putNumber("shoot speed left", shooterLeft.getSpeed()*Constants.RPM_PER_ENC_VEL);
-		SmartDashboard.putNumber("shoot speed right", shooterRight.getSpeed()*Constants.RPM_PER_ENC_VEL);
-		SmartDashboard.putNumber("right err", shooterRight.getError()*Constants.RPM_PER_ENC_VEL);
-		SmartDashboard.putNumber("left err", shooterLeft.getError()*Constants.RPM_PER_ENC_VEL);
-		SmartDashboard.putNumber("left I Acc", shooterLeft.GetIaccum());
-		SmartDashboard.putNumber("right I Acc", shooterRight.GetIaccum());
-		SmartDashboard.putNumber("ramp", shooterLeft.getCloseLoopRampRate());
-		
+		angle = table.getNumber(Constants.TURRET_OUTPUT_ANGLE_NAME, 0);
+		lazySusan.set(axis);
 	}
-	
-	public void autoShoot(){
-		double tempRPM = table.getNumber(Constants.TURRET_OUTPUT_RPM_NAME, 0);
-		if(tempRPM != -1) rpm = tempRPM;
-		shoot(rpm);
-		SmartDashboard.putNumber("wanted RPM", rpm);
-	}
-	
-
 	
 	int lastSide = 0;
-	public void spinToAngle(double angle){
-		if(lazySusan.getControlMode() != TalonControlMode.Position){
-			DriverStation.reportWarning("resetting mode", false);
+	public boolean spinToAngle(double angle){
+		if(!lazySusan.getControlMode().equals(TalonControlMode.Position)){
+			lazySusan.changeControlMode(TalonControlMode.Position);
 		}
 		
 		double rots = toNumRotations(angle);
@@ -133,15 +102,49 @@ public class Turret {
 		}
 		SmartDashboard.putNumber("turret angle", toAngle(lazySusan.getPosition()));
 		lastSide = side;
+		return Math.abs(angle - getCurrentAngle()) < 1;
 	}
 	
 	double angle = 0;
-	public void autoAim(){
+	public boolean autoAim(){
 		if(!isMovingFast){
 			angle = table.getNumber(Constants.TURRET_OUTPUT_ANGLE_NAME, 0);
 		}
 		spinToAngle(angle);
+		return Math.abs(angle - getCurrentAngle()) < 1;
 	}
+	
+	/* SHOOTING */
+	
+	public void shoot(double speed){
+		shooterLeft.changeControlMode(TalonControlMode.Speed);
+		shooterRight.changeControlMode(TalonControlMode.Speed);
+		double targetSpeed = speed * (1.0/Constants.ENCODER_UPDATES_PER_MIN) * Constants.ENCODER_COUNTS_PER_ROT;
+		if(targetSpeed == 0){
+			shooterLeft.clearIAccum();
+			shooterRight.clearIAccum();
+		}
+		shooterLeft.set(targetSpeed);
+		shooterRight.set(-targetSpeed);
+		SmartDashboard.putNumber("shoot speed left", shooterLeft.getSpeed()*Constants.RPM_PER_ENC_VEL);
+		SmartDashboard.putNumber("shoot speed right", shooterRight.getSpeed()*Constants.RPM_PER_ENC_VEL);
+		SmartDashboard.putNumber("right err", shooterRight.getError()*Constants.RPM_PER_ENC_VEL);
+		SmartDashboard.putNumber("left err", shooterLeft.getError()*Constants.RPM_PER_ENC_VEL);
+		SmartDashboard.putNumber("left I Acc", shooterLeft.GetIaccum());
+		SmartDashboard.putNumber("right I Acc", shooterRight.GetIaccum());
+		SmartDashboard.putNumber("ramp", shooterLeft.getCloseLoopRampRate());
+		
+	}
+	
+	public boolean autoShoot(){
+		double tempRPM = table.getNumber(Constants.TURRET_OUTPUT_RPM_NAME, 0);
+		if(tempRPM != -1) rpm = tempRPM;
+		shoot(rpm);
+		SmartDashboard.putNumber("wanted RPM", rpm);
+		return Math.abs(rpm - getShooterSpeed()) < 100;
+	}
+	
+	/* CONVERSIONS */
 	
 	public static double toNumRotations(double angle){
 		return angle * Constants.TURRET_ROTS_PER_DEGREE;
@@ -151,6 +154,8 @@ public class Turret {
 		return rots / Constants.TURRET_ROTS_PER_DEGREE;
 	}
 	
+	/* GETTERS */
+	
 	public double getCurrentAngle(){
 		return toAngle(lazySusan.getPosition());
 	}
@@ -159,9 +164,6 @@ public class Turret {
 		return shooterLeft.getSpeed()*Constants.RPM_PER_ENC_VEL;
 	}
 	
-	public void spin(double axis){
-		lazySusan.changeControlMode(TalonControlMode.PercentVbus);
-		lazySusan.set(axis);
-	}
+	
 	
 }

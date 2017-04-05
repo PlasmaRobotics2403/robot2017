@@ -29,11 +29,11 @@ public class Lift {
 		liftRear.set(-speed * Constants.MAX_LIFT_SPEED);
 	}
 	
-	public void up(double speed){
+	public void down(double speed){
 		spin(-Math.abs(speed));
 	}
 	
-	public void down(double speed){
+	public void up(double speed){
 		spin(Math.abs(speed));
 	}
 	
