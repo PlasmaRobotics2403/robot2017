@@ -62,7 +62,7 @@ public class Robot extends IterativeRobot {
 		climb = new Climb(Constants.TALON_CLIMB_L_ID, 
 							Constants.TALON_CLIMB_R_ID);
 		
-		alliance = DriverStation.getInstance().getAlliance() == Alliance.Red;
+		
 		
 		autoModeRunner = new AutoModeRunner();	
 		
@@ -87,19 +87,14 @@ public class Robot extends IterativeRobot {
             }
         }).start();
 		
-		SmartDashboard.putNumber("wanted RPM", 0);
-		
 		autoModes = new AutoMode[10];
 		for(int i = 0; i < autoModes.length; i++){
 			autoModes[i] = new Nothing();
 		}
-		autoModes[1] = new CrossBaseline(driveTrain);
-		autoModes[2] = new CenterGear(driveTrain, gearManip, visionTable);
-		autoModes[3] = new ShootFuelCenter(true, turret, lift, intakeFront, intakeRear);
-		autoModes[4] = new ShootFuelCenter(false, turret, lift, intakeFront, intakeRear);
-		autoModes[5] = new FuelTest(false, turret, lift, intakeFront, intakeRear);
+
 		autoModeSelection = 0;
 		SmartDashboard.putNumber("Auto Mode", 0);
+		dashboardTable.putString("auto", "0");
 	}
 	@Override
 	public void robotPeriodic(){
@@ -133,6 +128,14 @@ public class Robot extends IterativeRobot {
 		
 	@Override
 	public void autonomousInit() {
+		alliance = DriverStation.getInstance().getAlliance() == Alliance.Red;
+		autoModes[1] = new CrossBaseline(driveTrain);
+		autoModes[2] = new CenterGear(false, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, dashboardTable);
+		autoModes[3] = new BoilerGear(false, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, dashboardTable);
+		autoModes[4] = new FeederGear(alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, dashboardTable);
+		autoModes[5] = new ShootFuelCenter(alliance, driveTrain, turret, lift, intakeFront, intakeRear);
+		autoModes[6] = new CenterGear(true, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, dashboardTable);
+		autoModes[7] = new BoilerGear(true, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, dashboardTable);
 		driveTrain.zeroGyro();
 		autoModeSelection = (autoModeSelection >= autoModes.length) ? 0 : autoModeSelection;
 		autoModeSelection = (autoModeSelection < 0) ? 0 : autoModeSelection;
