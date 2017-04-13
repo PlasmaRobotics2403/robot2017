@@ -106,6 +106,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledInit(){
 		autoModeRunner.stop();
+		visionTable.putNumber("fieldStatus", 0);
 		
 	}
 	
@@ -128,14 +129,15 @@ public class Robot extends IterativeRobot {
 		
 	@Override
 	public void autonomousInit() {
+		visionTable.putNumber("fieldStatus", 1);
 		alliance = DriverStation.getInstance().getAlliance() == Alliance.Red;
 		autoModes[1] = new CrossBaseline(driveTrain);
-		autoModes[2] = new CenterGear(false, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, dashboardTable);
-		autoModes[3] = new BoilerGear(false, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, dashboardTable);
-		autoModes[4] = new FeederGear(alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, dashboardTable);
+		autoModes[2] = new CenterGear(false, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, visionTable);
+		autoModes[3] = new BoilerGear(false, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, visionTable);
+		autoModes[4] = new FeederGear(alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, visionTable);
 		autoModes[5] = new ShootFuelCenter(alliance, driveTrain, turret, lift, intakeFront, intakeRear);
-		autoModes[6] = new CenterGear(true, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, dashboardTable);
-		autoModes[7] = new BoilerGear(true, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, dashboardTable);
+		autoModes[6] = new CenterGear(true, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, visionTable);
+		autoModes[7] = new BoilerGear(true, alliance, driveTrain, gearManip, turret, lift, intakeFront, intakeRear, visionTable);
 		driveTrain.zeroGyro();
 		autoModeSelection = (autoModeSelection >= autoModes.length) ? 0 : autoModeSelection;
 		autoModeSelection = (autoModeSelection < 0) ? 0 : autoModeSelection;
@@ -151,6 +153,7 @@ public class Robot extends IterativeRobot {
 	public void teleopInit(){
 		autoModeRunner.stop();
 		driveTrain.zeroGyro();
+		visionTable.putNumber("fieldStatus", 2);
 	}
 	
 	@Override
@@ -176,6 +179,30 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void driver2Controls(PlasmaJoystick joy){
+		if(joy.L3.isPressed()){
+			turret.autoAim();
+		}
+		else{
+			turret.spin(joy.LeftX.getFilteredAxis());
+		}
+		
+		if(joy.RT.isPressed()){
+			if(turret.autoShoot()){
+				lift.up(1);
+				intakeRear.in(1);
+				intakeFront.in(1);
+			}
+			else{
+				manageBallManip(joy);
+			}
+		}
+		else{
+			turret.shoot(0);
+			manageBallManip(joy);
+		}
+	}
+	
+	public void manageBallManip(PlasmaJoystick joy){
 		if(joy.RB.isPressed()){
 			intakeRear.in(1);
 			intakeFront.in(1);
@@ -197,20 +224,6 @@ public class Robot extends IterativeRobot {
 		}
 		else{
 			lift.down(0);
-		}
-		
-		if(joy.L3.isPressed()){
-			turret.autoAim();
-		}
-		else{
-			turret.spin(joy.LeftX.getFilteredAxis());
-		}
-		
-		if(joy.RT.isPressed()){
-			turret.autoShoot();
-		}
-		else{
-			turret.shoot(0);
 		}
 	}
 	

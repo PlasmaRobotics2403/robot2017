@@ -7,6 +7,7 @@ import org.usfirst.frc.team2403.robot.Constants;
 import org.usfirst.frc.team2403.robot.DriveTrain;
 import org.usfirst.frc.team2403.robot.auto.util.Action;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 /**
@@ -39,7 +40,13 @@ public class GearLiftApproach implements Action {
 	@Override
 	public void start() {
 		angle = table.getNumber(Constants.GEAR_OUTPUT_ANGLE_NAME, 0);
-		distance = table.getNumber(Constants.GEAR_OUTPUT_DISTANCE_NAME, 10);
+		distance = table.getNumber(Constants.GEAR_OUTPUT_DISTANCE_NAME, -1);
+		//DriverStation.reportError(distance + "", false);
+		if(distance <= 0){
+			distance = 1000;
+			speed = 0;
+			DriverStation.reportError("Vision failed", false);
+		}
 		drive.resetEncoders();
 	}
 

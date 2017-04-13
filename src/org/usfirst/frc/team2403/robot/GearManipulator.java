@@ -74,6 +74,43 @@ public class GearManipulator {
 	boolean clampModifier = false;
 	public void activate(boolean open, boolean clamp){
 		if(open){
+			doorLeft.setAngle(140);
+			doorRight.setAngle(0);
+			
+			if(wasOpen == false){
+				timeToPush = Timer.getFPGATimestamp() + .15;
+				if(clamp != clampModifier){
+					clampModifier = !clampModifier;
+				}
+			}
+			
+			if(Timer.getFPGATimestamp() > timeToPush){
+				pusherLeft.setAngle(90);
+				pusherRight.setAngle(0);
+			}
+			else{
+				pusherLeft.setAngle(0);
+				pusherRight.setAngle(90);
+			}
+		}
+		else{
+			doorLeft.setAngle(90);
+			doorRight.setAngle(90);
+			if(clamp != clampModifier){
+				pusherLeft.setAngle(47);
+				pusherRight.setAngle(58);
+			}
+			else{
+				pusherLeft.setAngle(0);
+				pusherRight.setAngle(90);
+			}
+		}
+		wasOpen = open;
+		
+	}
+	
+	public void activatePractice(boolean open, boolean clamp){
+		if(open){
 			doorLeft.setAngle(55);
 			doorRight.setAngle(125);
 			
@@ -108,6 +145,4 @@ public class GearManipulator {
 		wasOpen = open;
 		
 	}
-	
-	
 }

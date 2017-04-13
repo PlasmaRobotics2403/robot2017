@@ -48,11 +48,11 @@ public class FeederGear extends AutoMode {
 		runAction(new MoveGearManipulator(gearManip, false, true));
 		runAction(new DriveStraight(.35, 65, drive));
 		runAction(new Wait(.5));
-		runAction(new TurnAngle(.35, 60.0 * sideMultiplier, drive));
-		runAction(new Wait(.5));
-		runAction(new DriveStraight(.35, 40, drive));
+		runAction(new TurnAngle(.5, 60.0 * sideMultiplier, drive));
 		runAction(new Wait(.5));
 		runAction(new GearLiftAlign(drive, table));
+		runAction(new Wait(.5));
+		runAction(new DriveStraight(.35, 10, drive));
 		runAction(new Wait(.5));
 		runAction(new GearLiftApproach(.2, drive, table));
 		runAction(new MoveGearManipulator(gearManip, true, false));
