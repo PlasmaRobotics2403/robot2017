@@ -203,11 +203,11 @@ public class DriveTrain {
 	}
 	
 	public void leftWheelDrive(double speed){
-		talonLeft.set(speed * Constants.MAX_DRIVE_SPEED);
+		talonLeft.set(speed * Constants.MAX_AUTO_DRIVE_SPEED);
 	}
 	
 	public void rightWheelDrive(double speed){
-		talonRight.set(speed * Constants.MAX_DRIVE_SPEED);
+		talonRight.set(speed * Constants.MAX_AUTO_DRIVE_SPEED);
 	}
 	
 	public void gyroStraight(double speed, double angle){

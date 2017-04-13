@@ -29,8 +29,9 @@ public class Constants {
 	public static final int GEAR_PUSH_R_PORT = 1;
 	
 	/*DRIVETRAIN CONSTANTS*/
-	public static final double MAX_DRIVE_SPEED = .9;
-	public static final double MAX_DRIVE_TURN = .9;	
+	public static final double MAX_AUTO_DRIVE_SPEED = .9;
+	public static final double MAX_DRIVE_SPEED = 1;
+	public static final double MAX_DRIVE_TURN = 1;	
 	public static final double DRIVE_ENCODER_CONVERSION = 20.9528184;
 	public static final double DRIVE_WHEEL_WIDTH = 27;
 	
